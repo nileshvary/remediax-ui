@@ -400,14 +400,15 @@ export default function AgentPipeline() {
               strokeWidth="2"
               opacity="1" />
 
-            {/* Broad purple dotted circle orbiting the hexagon — 2s clockwise */}
-            <circle cx={ORC.cx} cy={ORC.cy} r="70"
+
+            {/* Purple traveling dotted border — outside blue border, active scan ring */}
+            <polygon points={HEX_PTS_OUTER}
               fill="none"
-              stroke="#9333EA"
-              strokeWidth="2"
-              strokeDasharray="10 6"
+              stroke="#7C3AED"
+              strokeWidth="3"
+              strokeDasharray="6 8"
               strokeOpacity="0.80"
-              style={{ animation: 'marching-ants 2s linear infinite' }} />
+              style={{ animation: 'hex-march-cw 4s linear infinite' }} />
 
             {/* Glass top-edge highlights */}
             <line x1="390" y1="108" x2="444" y2="139"
