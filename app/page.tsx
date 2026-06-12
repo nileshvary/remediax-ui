@@ -39,10 +39,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold" style={{ color: '#E2E8F0' }}>
-                Security Operations Center
+                AI Threat Intelligence Center
               </h1>
               <p className="text-sm mt-0.5" style={{ color: 'rgba(148,163,184,0.5)' }}>
-                Real-time threat monitoring &amp; AI-powered analysis
+                Autonomous LLM security detection &amp; real-time remediation
               </p>
             </div>
             <div className="flex items-center gap-2">
