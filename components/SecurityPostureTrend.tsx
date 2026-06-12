@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   LineChart,
   Line,
@@ -47,7 +48,10 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export default function SecurityPostureTrend() {
   return (
-    <div className="glass-card p-4 flex flex-col gap-3">
+    <motion.div className="glass-card p-4 flex flex-col gap-3"
+      style={{ animation: 'fade-in-up 0.5s ease-out 0.25s both' }}
+      whileHover={{ boxShadow: '0 0 0 1px rgba(0,255,135,0.2), 0 8px 32px rgba(0,255,135,0.07)', transition: { duration: 0.2 } }}
+    >
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Security Posture Trend</h3>
@@ -113,6 +117,6 @@ export default function SecurityPostureTrend() {
         </span>
         <span style={{ color: '#00FF87' }}>+12pts this week</span>
       </div>
-    </div>
+    </motion.div>
   );
 }

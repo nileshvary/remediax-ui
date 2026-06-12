@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Server, Database, Globe, Mail, Cpu, ArrowRight } from 'lucide-react';
 
 const assets = [
@@ -19,7 +20,10 @@ export default function TopAttackedAssets() {
   }, []);
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3">
+    <motion.div className="glass-card p-4 flex flex-col gap-3"
+      style={{ animation: 'fade-in-up 0.5s ease-out 0.3s both' }}
+      whileHover={{ boxShadow: '0 0 0 1px rgba(0,212,255,0.2), 0 8px 32px rgba(0,212,255,0.08)', transition: { duration: 0.2 } }}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Server size={14} style={{ color: '#00D4FF' }} />
@@ -92,6 +96,6 @@ export default function TopAttackedAssets() {
           Manage Assets →
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

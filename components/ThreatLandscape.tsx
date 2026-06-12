@@ -1,13 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { motion } from 'framer-motion';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
@@ -146,7 +141,10 @@ export default function ThreatLandscape() {
   const displayData = data.length > 0 ? data : [];
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3">
+    <motion.div className="glass-card p-4 flex flex-col gap-3"
+      style={{ animation: 'fade-in-up 0.5s ease-out 0.1s both' }}
+      whileHover={{ boxShadow: '0 0 0 1px rgba(0,212,255,0.2), 0 8px 32px rgba(0,212,255,0.08)', transition: { duration: 0.2 } }}
+    >
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Threat Landscape</h3>
         <div className="flex items-center gap-1">
@@ -262,6 +260,6 @@ export default function ThreatLandscape() {
           Full Report
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import RemediAXLogo from './RemediAXLogo';
 import {
   LayoutDashboard,
@@ -114,26 +115,16 @@ export default function Sidebar() {
             const isActive = activeItem === item.label;
             return (
               <li key={item.label}>
-                <button
+                <motion.button
                   onClick={() => setActiveItem(item.label)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group relative"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium group relative"
                   style={{
                     background: isActive ? 'rgba(0, 212, 255, 0.12)' : 'transparent',
                     color: isActive ? '#00D4FF' : 'rgba(148, 163, 184, 0.8)',
                     borderLeft: isActive ? '2px solid #00D4FF' : '2px solid transparent',
                   }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.05)';
-                      (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLButtonElement).style.color = 'rgba(148, 163, 184, 0.8)';
-                    }
-                  }}
+                  whileHover={{ background: isActive ? 'rgba(0,212,255,0.12)' : 'rgba(0,212,255,0.05)', x: isActive ? 0 : 2, transition: { duration: 0.15 } }}
+                  whileTap={{ scale: 0.97 }}
                 >
                   <Icon size={16} style={{ color: isActive ? '#00D4FF' : 'inherit', flexShrink: 0 }} />
                   <span className="flex-1 text-left">{item.label}</span>
@@ -158,7 +149,7 @@ export default function Sidebar() {
                       style={{ background: '#00D4FF', boxShadow: '0 0 8px #00D4FF' }}
                     />
                   )}
-                </button>
+                </motion.button>
               </li>
             );
           })}

@@ -123,10 +123,17 @@ export default function KPICards() {
               </motion.div>
             </div>
 
-            <div style={{ height: 36 }}>
+            <div style={{ height: 40, marginLeft: -8, marginRight: -8 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={kpi.trend}>
-                  <Line type="monotone" dataKey="v" stroke={kpi.color} strokeWidth={1.5} dot={false} strokeOpacity={0.8} />
+                  <defs>
+                    <filter id={`glow-${i}`}>
+                      <feGaussianBlur stdDeviation="2" result="blur" />
+                      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
+                  </defs>
+                  <Line type="monotone" dataKey="v" stroke={kpi.color} strokeWidth={2} dot={false}
+                    style={{ filter: `drop-shadow(0 0 3px ${kpi.color})` }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

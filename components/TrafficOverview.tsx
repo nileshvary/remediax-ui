@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   AreaChart,
   Area,
@@ -53,7 +54,10 @@ function CustomTooltip({ active, payload, label }: any) {
 
 export default function TrafficOverview() {
   return (
-    <div className="glass-card p-4 flex flex-col gap-3">
+    <motion.div className="glass-card p-4 flex flex-col gap-3"
+      style={{ animation: 'fade-in-up 0.5s ease-out 0.15s both' }}
+      whileHover={{ boxShadow: '0 0 0 1px rgba(0,212,255,0.2), 0 8px 32px rgba(0,212,255,0.07)', transition: { duration: 0.2 } }}
+    >
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Traffic Overview (24h)</h3>
         <div className="flex items-center gap-3 text-xs">
@@ -115,6 +119,6 @@ export default function TrafficOverview() {
           </AreaChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </motion.div>
   );
 }

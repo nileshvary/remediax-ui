@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Brain, ArrowRight, Sparkles, TrendingUp, AlertCircle } from 'lucide-react';
 
 const insights = [
@@ -120,10 +121,10 @@ export default function AIInsights() {
   const insight = insights[current];
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3 h-full" style={{
-      background: 'rgba(13, 8, 35, 0.75)',
-      border: '1px solid rgba(139, 92, 246, 0.2)',
-    }}>
+    <motion.div className="glass-card p-4 flex flex-col gap-3 h-full"
+      style={{ background: 'rgba(13, 8, 35, 0.75)', border: '1px solid rgba(139, 92, 246, 0.2)', animation: 'fade-in-up 0.5s ease-out 0.2s both' }}
+      whileHover={{ boxShadow: '0 0 0 1px rgba(139,92,246,0.35), 0 8px 32px rgba(139,92,246,0.12)', transition: { duration: 0.2 } }}
+    >
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -210,6 +211,6 @@ export default function AIInsights() {
           <ArrowRight size={11} />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
