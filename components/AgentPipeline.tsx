@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Radar, Brain, Wrench, FileText, CheckCircle2 } from 'lucide-react';
 
@@ -63,11 +63,13 @@ const LEGEND = [
   { color: '#00FF88', label: 'CVE Watcher' },
 ];
 
-const STATS = [
-  { label: 'Threats Found', value: '6',      color: '#EF4444' },
-  { label: 'Guardrails',    value: '10',     color: '#F59E0B' },
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
+const DEFAULT_STATS = [
+  { label: 'Threats Found', value: '—',      color: '#EF4444' },
+  { label: 'Guardrails',    value: '—',      color: '#F59E0B' },
   { label: 'Reports',       value: '1',      color: '#3B82F6' },
-  { label: 'Tests',         value: '680',    color: '#22C55E' },
+  { label: 'CVEs Tracked',  value: '—',      color: '#22C55E' },
   { label: 'Status',        value: 'Active', color: '#0066FF' },
 ];
 
@@ -134,6 +136,29 @@ function NodeCard({ n, glowId }: { n: NodeDef; glowId: string }) {
 export default function AgentPipeline() {
   const svgPad = `${((VBH / 700) * 100).toFixed(2)}%`;
   const cvRef  = useRef<HTMLCanvasElement>(null);
+  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [cveCount, setCveCount] = useState<string>('—');
+
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API}/api/score`).then(r => r.json()).catch(() => null),
+      fetch(`${API}/api/guardrails`).then(r => r.json()).catch(() => null),
+      fetch(`${API}/api/cve`).then(r => r.json()).catch(() => null),
+    ]).then(([score, guardrails, cve]) => {
+      const threats = score?.finding_count ?? null;
+      const guards = guardrails
+        ? (guardrails.input_guardrails?.length || 0) + (guardrails.output_guardrails?.length || 0)
+        : null;
+      const cves = cve?.total ?? cve?.count ?? (Array.isArray(cve) ? cve.length : null);
+      setCveCount(cves !== null ? String(cves) : '—');
+      setStats(prev => prev.map(s => {
+        if (s.label === 'Threats Found') return { ...s, value: threats !== null ? String(threats) : '—' };
+        if (s.label === 'Guardrails')    return { ...s, value: guards  !== null ? String(guards)  : '—' };
+        if (s.label === 'CVEs Tracked')  return { ...s, value: cves    !== null ? String(cves)    : '—' };
+        return s;
+      }));
+    });
+  }, []);
 
   useEffect(() => {
     const cv = cvRef.current;
@@ -451,7 +476,8 @@ export default function AgentPipeline() {
               </div>
               <div className="text-right flex-shrink-0"
                 style={{ color: 'rgba(71,85,105,0.6)', fontSize: 10.5, lineHeight: 1.7 }}>
-                NVD API · MITRE ATLAS<br />OWASP · Garak probes
+                NVD API · MITRE ATLAS<br />
+                <span style={{ color: '#00FF88' }}>{cveCount} CVEs tracked</span>
               </div>
             </div>
           </div>
@@ -467,10 +493,10 @@ export default function AgentPipeline() {
       {/* ── Stats Bar ── */}
       <div className="grid grid-cols-5 flex-shrink-0"
         style={{ borderTop: '1px solid rgba(0,102,255,0.08)' }}>
-        {STATS.map((s, i) => (
+        {stats.map((s, i) => (
           <div key={s.label}
             className="flex flex-col items-center justify-center py-3"
-            style={{ borderRight: i < STATS.length - 1 ? '1px solid rgba(0,102,255,0.08)' : 'none' }}>
+            style={{ borderRight: i < stats.length - 1 ? '1px solid rgba(0,102,255,0.08)' : 'none' }}>
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: s.color }} />
               <span style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 700 }}>{s.value}</span>
