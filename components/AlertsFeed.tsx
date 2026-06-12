@@ -1,29 +1,70 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { AlertTriangle, AlertCircle, ChevronRight, Filter } from 'lucide-react';
+import { AlertTriangle, AlertCircle, ChevronRight, Shield } from 'lucide-react';
 
-const initialAlerts = [
-  { id: 1, title: 'Malicious IP Detected', severity: 'High', time: '2m ago', src: '192.168.1.45', type: 'Threat Detection' },
-  { id: 2, title: 'Brute Force Attack', severity: 'Medium', time: '5m ago', src: '10.0.0.23', type: 'Authentication' },
-  { id: 3, title: 'Unusual Data Transfer', severity: 'Medium', time: '10m ago', src: '172.16.0.8', type: 'Data Exfil' },
-  { id: 4, title: 'Possible DDoS Activity', severity: 'High', time: '15m ago', src: 'Multiple', type: 'Availability' },
-  { id: 5, title: 'Vulnerability Exploit', severity: 'High', time: '18m ago', src: '203.0.113.7', type: 'Exploit' },
-  { id: 6, title: 'Suspicious Login Attempt', severity: 'Medium', time: '22m ago', src: '198.51.100.3', type: 'Authentication' },
-  { id: 7, title: 'Port Scan Detected', severity: 'Low', time: '30m ago', src: '10.0.1.100', type: 'Recon' },
-];
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
-const SEV_CONFIG: Record<string, { color: string; bg: string; border: string; icon: React.ElementType }> = {
-  High: { color: '#FF2D55', bg: 'rgba(255,45,85,0.1)', border: 'rgba(255,45,85,0.3)', icon: AlertTriangle },
-  Medium: { color: '#FF8C00', bg: 'rgba(255,140,0,0.1)', border: 'rgba(255,140,0,0.3)', icon: AlertCircle },
-  Low: { color: '#00D4FF', bg: 'rgba(0,212,255,0.08)', border: 'rgba(0,212,255,0.2)', icon: AlertCircle },
+const SEV_ORDER: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+
+const SEV_CONFIG: Record<string, { color: string; bg: string; border: string; icon: React.ElementType; label: string }> = {
+  CRITICAL: { color: '#FF2D55', bg: 'rgba(255,45,85,0.1)', border: 'rgba(255,45,85,0.3)', icon: AlertTriangle, label: 'Critical' },
+  HIGH:     { color: '#FF8C00', bg: 'rgba(255,140,0,0.1)', border: 'rgba(255,140,0,0.3)',  icon: AlertTriangle, label: 'High' },
+  MEDIUM:   { color: '#EAB308', bg: 'rgba(234,179,8,0.08)', border: 'rgba(234,179,8,0.25)', icon: AlertCircle, label: 'Medium' },
+  LOW:      { color: '#00D4FF', bg: 'rgba(0,212,255,0.06)', border: 'rgba(0,212,255,0.18)', icon: Shield, label: 'Low' },
 };
 
+interface Alert {
+  id: string;
+  title: string;
+  severity: string;
+  category: string;
+  source: string;
+  probe: string;
+}
+
+function probeName(raw: string): string {
+  const parts = raw.split('.');
+  return parts[parts.length - 1].replace(/([A-Z])/g, ' $1').trim();
+}
+
 export default function AlertsFeed() {
-  const [alerts, setAlerts] = useState(initialAlerts);
-  const [filter, setFilter] = useState<'All' | 'High' | 'Medium' | 'Low'>('All');
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [filter, setFilter] = useState<'All' | 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'>('All');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch(`${API}/api/findings`);
+        const findings = await res.json();
+
+        const mapped: Alert[] = findings
+          .sort((a: any, b: any) =>
+            (SEV_ORDER[a.severity?.toUpperCase() || 'LOW'] ?? 3) -
+            (SEV_ORDER[b.severity?.toUpperCase() || 'LOW'] ?? 3)
+          )
+          .map((f: any, i: number) => ({
+            id: String(i),
+            title: probeName(f.probe_name || 'Unknown Probe'),
+            severity: (f.severity || 'LOW').toUpperCase(),
+            category: f.owasp_llm_category || '—',
+            source: f.source || 'scanner',
+            probe: f.probe_name || '',
+          }));
+
+        setAlerts(mapped);
+      } catch {
+        // API not running — empty state
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   const filtered = filter === 'All' ? alerts : alerts.filter((a) => a.severity === filter);
+  const criticalCount = alerts.filter((a) => a.severity === 'CRITICAL' || a.severity === 'HIGH').length;
 
   return (
     <div className="glass-card p-4 flex flex-col gap-3 h-full">
@@ -31,16 +72,18 @@ export default function AlertsFeed() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <AlertTriangle size={15} style={{ color: '#FF2D55' }} />
-          <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Recent Alerts</h3>
-          <span
-            className="text-xs font-bold px-1.5 py-0.5 rounded-full"
-            style={{ background: '#FF2D55', color: '#fff', fontSize: '10px', boxShadow: '0 0 8px rgba(255,45,85,0.5)' }}
-          >
-            {alerts.filter(a => a.severity === 'High').length}
-          </span>
+          <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Scan Findings</h3>
+          {criticalCount > 0 && (
+            <span
+              className="text-xs font-bold px-1.5 py-0.5 rounded-full"
+              style={{ background: '#FF2D55', color: '#fff', fontSize: '10px', boxShadow: '0 0 8px rgba(255,45,85,0.5)' }}
+            >
+              {criticalCount}
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1">
-          {(['All', 'High', 'Medium', 'Low'] as const).map((f) => (
+          {(['All', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as const).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -52,7 +95,7 @@ export default function AlertsFeed() {
                 fontSize: '10px',
               }}
             >
-              {f}
+              {f === 'All' ? 'All' : f[0] + f.slice(1).toLowerCase()}
             </button>
           ))}
         </div>
@@ -60,8 +103,18 @@ export default function AlertsFeed() {
 
       {/* Feed */}
       <div className="flex-1 overflow-y-auto space-y-2" style={{ maxHeight: 340 }}>
+        {loading && (
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+            Loading findings…
+          </p>
+        )}
+        {!loading && filtered.length === 0 && (
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+            No findings. Run a scan to populate.
+          </p>
+        )}
         {filtered.map((alert, i) => {
-          const cfg = SEV_CONFIG[alert.severity];
+          const cfg = SEV_CONFIG[alert.severity] || SEV_CONFIG.LOW;
           const Icon = cfg.icon;
           return (
             <div
@@ -70,13 +123,13 @@ export default function AlertsFeed() {
               style={{
                 background: cfg.bg,
                 border: `1px solid ${cfg.border}`,
-                animation: `alert-slide 0.4s ease-out ${i * 60}ms both`,
+                animation: `alert-slide 0.4s ease-out ${i * 40}ms both`,
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = cfg.bg.replace('0.1', '0.18');
+                (e.currentTarget as HTMLDivElement).style.filter = 'brightness(1.15)';
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background = cfg.bg;
+                (e.currentTarget as HTMLDivElement).style.filter = '';
               }}
             >
               <div
@@ -90,25 +143,26 @@ export default function AlertsFeed() {
                   <p className="text-sm font-medium truncate" style={{ color: '#E2E8F0' }}>
                     {alert.title}
                   </p>
-                  <ChevronRight size={12} style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }} className="group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight
+                    size={12}
+                    style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }}
+                    className="group-hover:translate-x-0.5 transition-transform"
+                  />
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span
                     className="text-xs font-semibold px-1.5 py-0.5 rounded"
                     style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: '10px' }}
                   >
-                    {alert.severity}
+                    {cfg.label}
                   </span>
-                  <span className="text-xs" style={{ color: 'rgba(148,163,184,0.5)', fontSize: '10px' }}>
-                    {alert.type}
+                  <span className="text-xs" style={{ color: 'rgba(148,163,184,0.6)', fontSize: '10px' }}>
+                    {alert.category}
                   </span>
-                  <span className="text-xs ml-auto" style={{ color: 'rgba(148,163,184,0.4)', fontSize: '10px' }}>
-                    {alert.time}
+                  <span className="text-xs ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: '10px' }}>
+                    {alert.source}
                   </span>
                 </div>
-                <p className="text-xs mt-0.5" style={{ color: 'rgba(148,163,184,0.5)', fontSize: '10px' }}>
-                  Source: {alert.src}
-                </p>
               </div>
             </div>
           );
@@ -124,7 +178,7 @@ export default function AlertsFeed() {
           color: '#00D4FF',
         }}
       >
-        View All Alerts
+        View All {alerts.length} Findings
       </button>
     </div>
   );
