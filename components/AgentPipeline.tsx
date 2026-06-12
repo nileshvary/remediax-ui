@@ -358,23 +358,23 @@ export default function AgentPipeline() {
             {/* Polygon 1 — fat glow (emits light outward) */}
             <polygon points={HEX_PTS}
               fill="none"
-              stroke="#00AAFF"
+              stroke="#0044BB"
               strokeWidth="20"
-              opacity="0.15"
+              opacity="0.18"
               filter="url(#hexGlow)" />
 
             {/* Polygon 2 — medium bloom */}
             <polygon points={HEX_PTS}
               fill="none"
-              stroke="#00AAFF"
+              stroke="#0066DD"
               strokeWidth="8"
-              opacity="0.40"
+              opacity="0.45"
               filter="url(#hexGlow)" />
 
             {/* Polygon 3 — sharp bright edge (no blur) */}
             <polygon points={HEX_PTS}
               fill="none"
-              stroke="#00CCFF"
+              stroke="#1A8FFF"
               strokeWidth="2"
               opacity="1" />
 
@@ -399,8 +399,8 @@ export default function AgentPipeline() {
                 width:22, height:22,
               }}>
                 <Brain size={19} style={{
-                  color: '#60C8FF',
-                  filter: 'drop-shadow(0 0 6px rgba(0,170,255,0.95))',
+                  color: '#4499FF',
+                  filter: 'drop-shadow(0 0 6px rgba(0,100,220,0.95))',
                 }} />
               </div>
             </foreignObject>
@@ -414,7 +414,7 @@ export default function AgentPipeline() {
 
             {/* Sub-label — electric blue */}
             <text x={ORC.cx} y={ORC.cy + 27} textAnchor="middle"
-              fill="#00AAFF" fontSize="7.5"
+              fill="#1A8FFF" fontSize="7.5"
               fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.90">
               Claude API Brain
             </text>
