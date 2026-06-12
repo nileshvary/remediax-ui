@@ -1,13 +1,14 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Clock, Radar, Brain, Wrench, FileText, CheckCircle2 } from 'lucide-react';
 
 // ─── SVG coordinate system (viewBox 0 0 780 292) ─────────────────────────────
 const VBW = 780;
 const VBH = 292;
 
-// ─── Connection paths (SVG only — no text) ────────────────────────────────────
+// ─── Connection paths ─────────────────────────────────────────────────────────
 const CONNECTIONS = [
   { id: 'ap0', d: 'M144,148 C222,148 224,52 316,52',      color: '#06B6D4', dots: 3 },
   { id: 'ap1', d: 'M390,92 L390,107',                      color: '#7C3AED', dots: 2 },
@@ -18,51 +19,20 @@ const CONNECTIONS = [
 ];
 
 const ARROWS: [string, string][] = [
-  ['312,46 316,52 312,58',   '#06B6D4'],
-  ['384,103 390,107 396,103','#7C3AED'],
-  ['319,246 325,242 331,246','#7C3AED'],
-  ['632,142 636,148 632,154','#F59E0B'],
-  ['697,188 701,184 697,180','#3B82F6'],
+  ['312,46 316,52 312,58',    '#06B6D4'],
+  ['384,103 390,107 396,103', '#7C3AED'],
+  ['319,246 325,242 331,246', '#7C3AED'],
+  ['632,142 636,148 632,154', '#F59E0B'],
+  ['697,188 701,184 697,180', '#3B82F6'],
 ];
 
-// ─── HTML card definitions ─────────────────────────────────────────────────────
-// Positions as % of the container (derived from SVG nx/ny/nw/nh ÷ VBW/VBH)
+// ─── HTML card definitions — positions as % of container ─────────────────────
 const CARDS = [
-  {
-    id: 'a1',
-    title: 'Agent 1', name: 'Scanner', tool: 'Garak + PyRIT',
-    color: '#06B6D4', Icon: Radar,
-    left: `${(18 / VBW) * 100}%`,  top: `${(116 / VBH) * 100}%`,
-    width: `${(118 / VBW) * 100}%`, height: `${(64 / VBH) * 100}%`,
-  },
-  {
-    id: 'a5',
-    title: 'Agent 5', name: 'Orchestrator', tool: 'Claude API Brain',
-    color: '#7C3AED', Icon: Brain,
-    left: `${(322 / VBW) * 100}%`, top: `${(16 / VBH) * 100}%`,
-    width: `${(136 / VBW) * 100}%`, height: `${(68 / VBH) * 100}%`,
-  },
-  {
-    id: 'a2',
-    title: 'Agent 2', name: 'Remediator', tool: 'LLM Guard + NeMo',
-    color: '#F59E0B', Icon: Wrench,
-    left: `${(318 / VBW) * 100}%`, top: `${(112 / VBH) * 100}%`,
-    width: `${(144 / VBW) * 100}%`, height: `${(72 / VBH) * 100}%`,
-  },
-  {
-    id: 'a3',
-    title: 'Agent 3', name: 'Reporter', tool: 'Claude + Jinja2',
-    color: '#3B82F6', Icon: FileText,
-    left: `${(329 / VBW) * 100}%`, top: `${(208 / VBH) * 100}%`,
-    width: `${(122 / VBW) * 100}%`, height: `${(64 / VBH) * 100}%`,
-  },
-  {
-    id: 'a4',
-    title: 'Agent 4', name: 'Verifier', tool: 'Promptfoo CI',
-    color: '#22C55E', Icon: CheckCircle2,
-    left: `${(640 / VBW) * 100}%`, top: `${(116 / VBH) * 100}%`,
-    width: `${(118 / VBW) * 100}%`, height: `${(64 / VBH) * 100}%`,
-  },
+  { id: 'a1', title: 'Agent 1', name: 'Scanner',     tool: 'Garak + PyRIT',     color: '#06B6D4', Icon: Radar,       left: `${(18/VBW)*100}%`,  top: `${(116/VBH)*100}%`, width: `${(118/VBW)*100}%`, height: `${(64/VBH)*100}%`  },
+  { id: 'a5', title: 'Agent 5', name: 'Orchestrator',tool: 'Claude API Brain',  color: '#7C3AED', Icon: Brain,       left: `${(322/VBW)*100}%`, top: `${(16/VBH)*100}%`,  width: `${(136/VBW)*100}%`, height: `${(68/VBH)*100}%`  },
+  { id: 'a2', title: 'Agent 2', name: 'Remediator',  tool: 'LLM Guard + NeMo',  color: '#F59E0B', Icon: Wrench,      left: `${(318/VBW)*100}%`, top: `${(112/VBH)*100}%`, width: `${(144/VBW)*100}%`, height: `${(72/VBH)*100}%`  },
+  { id: 'a3', title: 'Agent 3', name: 'Reporter',    tool: 'Claude + Jinja2',   color: '#3B82F6', Icon: FileText,    left: `${(329/VBW)*100}%`, top: `${(208/VBH)*100}%`, width: `${(122/VBW)*100}%`, height: `${(64/VBH)*100}%`  },
+  { id: 'a4', title: 'Agent 4', name: 'Verifier',    tool: 'Promptfoo CI',      color: '#22C55E', Icon: CheckCircle2,left: `${(640/VBW)*100}%`, top: `${(116/VBH)*100}%`, width: `${(118/VBW)*100}%`, height: `${(64/VBH)*100}%`  },
 ];
 
 const LEGEND = [
@@ -81,16 +51,29 @@ const STATS = [
   { label: 'Status',        value: 'Active', color: '#7C3AED' },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Animation variants ───────────────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cardVariants: any = {
+  hidden: { opacity: 0, scale: 0.82 },
+  visible: (i: number) => ({
+    opacity: 1, scale: 1,
+    transition: { duration: 0.45, delay: i * 0.13, type: 'spring', stiffness: 120, damping: 14 },
+  }),
+};
 
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function AgentPipeline() {
   const svgPad = `${((VBH / VBW) * 100).toFixed(2)}%`;
   const a4xPct = `${((701 / VBW) * 100).toFixed(2)}%`;
 
   return (
-    <div className="flex flex-col"
-      style={{ background: '#0D1117', border: '1px solid #1e293b', borderRadius: 10, overflow: 'hidden' }}>
-
+    <motion.div
+      className="flex flex-col"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      style={{ background: '#0D1117', border: '1px solid #1e293b', borderRadius: 10, overflow: 'hidden' }}
+    >
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <div className="flex items-start justify-between px-5 py-3 flex-shrink-0"
         style={{ borderBottom: '1px solid #1e293b' }}>
@@ -116,10 +99,10 @@ export default function AgentPipeline() {
         </div>
       </div>
 
-      {/* ── Pipeline canvas (SVG lines + HTML cards) ──────────────────────── */}
+      {/* ── Pipeline canvas ───────────────────────────────────────────────── */}
       <div className="relative w-full" style={{ paddingBottom: svgPad, background: '#0D1117' }}>
 
-        {/* SVG layer — connection lines + animated dots only, no text */}
+        {/* SVG layer — lines + animated dots only */}
         <svg viewBox={`0 0 ${VBW} ${VBH}`}
           className="absolute inset-0 w-full h-full"
           style={{ display: 'block', overflow: 'visible' }}>
@@ -129,23 +112,15 @@ export default function AgentPipeline() {
               <circle cx="1" cy="1" r="0.65" fill="#1e293b" />
             </pattern>
           </defs>
-
-          {/* Background grid */}
           <rect width={VBW} height={VBH} fill="url(#ap-dot)" />
-
-          {/* Stage dividers */}
           {[144, 312, 468, 636].map((x) => (
             <line key={x} x1={x} y1="6" x2={x} y2={VBH - 6}
               stroke="#1e293b" strokeWidth="1" strokeDasharray="3,7" strokeOpacity="0.8" />
           ))}
-
-          {/* Connection dashes */}
           {CONNECTIONS.map((c) => (
             <path key={`line-${c.id}`} d={c.d} fill="none" stroke={c.color}
               strokeWidth="1" strokeDasharray="5,4" strokeOpacity="0.38" />
           ))}
-
-          {/* Animated dots */}
           {CONNECTIONS.flatMap((c) =>
             Array.from({ length: c.dots }, (_, k) => {
               const begin = `${(-(k * 2 / c.dots)).toFixed(3)}s`;
@@ -158,61 +133,53 @@ export default function AgentPipeline() {
               );
             })
           )}
-
-          {/* Arrowheads */}
           {ARROWS.map(([pts, col], i) => (
             <polyline key={i} points={pts} fill="none" stroke={col}
               strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.75" />
           ))}
         </svg>
 
-        {/* HTML card layer — fixed CSS fonts, no SVG scaling */}
-        {CARDS.map((c) => {
+        {/* HTML card layer — framer-motion entrance + hover */}
+        {CARDS.map((c, i) => {
           const Icon = c.Icon;
           const isHub = c.id === 'a2';
           return (
-            <div
+            <motion.div
               key={c.id}
-              className="absolute flex flex-col items-center justify-center gap-0.5"
+              custom={i}
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
+              whileHover={{
+                scale: 1.06,
+                boxShadow: `0 0 0 1px ${c.color}80, 0 4px 24px ${c.color}30`,
+                transition: { duration: 0.18 },
+              }}
+              className="absolute flex flex-col items-center justify-center gap-0.5 cursor-default"
               style={{
                 left: c.left, top: c.top, width: c.width, height: c.height,
                 background: '#0f1523',
                 border: `${isHub ? 1.4 : 0.9}px solid ${c.color}`,
-                borderOpacity: isHub ? 0.9 : 0.55,
                 borderRadius: 8,
                 boxShadow: `0 0 0 1px ${c.color}${isHub ? '55' : '30'}, inset 0 0 12px ${c.color}08`,
               }}
             >
               <Icon size={12} style={{ color: c.color, opacity: 0.9, flexShrink: 0 }} />
-              <span style={{
-                color: '#94A3B8', fontSize: 9, fontWeight: 500, letterSpacing: '0.03em',
-                lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif',
-              }}>
+              <span style={{ color: '#94A3B8', fontSize: 9, fontWeight: 500, letterSpacing: '0.03em', lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif' }}>
                 {c.title}
               </span>
-              <span style={{
-                color: '#F1F5F9', fontSize: 10, fontWeight: 700,
-                lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif',
-              }}>
+              <span style={{ color: '#F1F5F9', fontSize: 10, fontWeight: 700, lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif' }}>
                 {c.name}
               </span>
-              <span style={{
-                color: c.color, fontSize: 8, opacity: 0.85,
-                lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif',
-                background: `${c.color}18`,
-                border: `0.5px solid ${c.color}40`,
-                borderRadius: 3,
-                padding: '1px 5px',
-                marginTop: 1,
-              }}>
+              <span style={{ color: c.color, fontSize: 8, opacity: 0.85, lineHeight: 1, fontFamily: 'Inter, ui-sans-serif, sans-serif', background: `${c.color}18`, border: `0.5px solid ${c.color}40`, borderRadius: 3, padding: '1px 5px', marginTop: 1 }}>
                 {c.tool}
               </span>
-            </div>
+            </motion.div>
           );
         })}
       </div>
 
-      {/* ── CVE Watcher panel ──────────────────────────────────────────────── */}
+      {/* ── CVE Watcher ───────────────────────────────────────────────────── */}
       <div className="relative flex-shrink-0" style={{ background: '#0D1424', borderTop: '1px solid #334155' }}>
         <div className="absolute top-0 w-px"
           style={{ left: a4xPct, height: 12, background: 'repeating-linear-gradient(to bottom,#22C55E 0 3px,transparent 3px 6px)', opacity: 0.55 }} />
@@ -239,19 +206,24 @@ export default function AgentPipeline() {
         </div>
       </div>
 
-      {/* ── Stats bar ──────────────────────────────────────────────────────── */}
+      {/* ── Stats bar ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-5 flex-shrink-0" style={{ borderTop: '1px solid #1e293b' }}>
         {STATS.map((s, i) => (
-          <div key={s.label} className="flex flex-col items-center justify-center py-3"
-            style={{ borderRight: i < STATS.length - 1 ? '1px solid #1e293b' : 'none' }}>
+          <motion.div key={s.label}
+            className="flex flex-col items-center justify-center py-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 + i * 0.07 }}
+            style={{ borderRight: i < STATS.length - 1 ? '1px solid #1e293b' : 'none' }}
+          >
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: s.color }} />
               <span style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 700 }}>{s.value}</span>
             </div>
             <span style={{ color: '#475569', fontSize: 10 }}>{s.label}</span>
-          </div>
+          </motion.div>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

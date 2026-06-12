@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, AlertCircle, ChevronRight, Shield } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
@@ -8,20 +9,13 @@ const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 const SEV_ORDER: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
 const SEV_CONFIG: Record<string, { color: string; bg: string; border: string; icon: React.ElementType; label: string }> = {
-  CRITICAL: { color: '#FF2D55', bg: 'rgba(255,45,85,0.1)', border: 'rgba(255,45,85,0.3)', icon: AlertTriangle, label: 'Critical' },
-  HIGH:     { color: '#FF8C00', bg: 'rgba(255,140,0,0.1)', border: 'rgba(255,140,0,0.3)',  icon: AlertTriangle, label: 'High' },
-  MEDIUM:   { color: '#EAB308', bg: 'rgba(234,179,8,0.08)', border: 'rgba(234,179,8,0.25)', icon: AlertCircle, label: 'Medium' },
-  LOW:      { color: '#00D4FF', bg: 'rgba(0,212,255,0.06)', border: 'rgba(0,212,255,0.18)', icon: Shield, label: 'Low' },
+  CRITICAL: { color: '#FF2D55', bg: 'rgba(255,45,85,0.08)',   border: 'rgba(255,45,85,0.25)',  icon: AlertTriangle, label: 'Critical' },
+  HIGH:     { color: '#FF8C00', bg: 'rgba(255,140,0,0.08)',   border: 'rgba(255,140,0,0.25)',  icon: AlertTriangle, label: 'High'     },
+  MEDIUM:   { color: '#EAB308', bg: 'rgba(234,179,8,0.06)',   border: 'rgba(234,179,8,0.2)',   icon: AlertCircle,   label: 'Medium'   },
+  LOW:      { color: '#00D4FF', bg: 'rgba(0,212,255,0.05)',   border: 'rgba(0,212,255,0.15)',  icon: Shield,        label: 'Low'      },
 };
 
-interface Alert {
-  id: string;
-  title: string;
-  severity: string;
-  category: string;
-  source: string;
-  probe: string;
-}
+interface Alert { id: string; title: string; severity: string; category: string; source: string; }
 
 function probeName(raw: string): string {
   const parts = raw.split('.');
@@ -38,27 +32,18 @@ export default function AlertsFeed() {
       try {
         const res = await fetch(`${API}/api/findings`);
         const findings = await res.json();
-
         const mapped: Alert[] = findings
-          .sort((a: any, b: any) =>
-            (SEV_ORDER[a.severity?.toUpperCase() || 'LOW'] ?? 3) -
-            (SEV_ORDER[b.severity?.toUpperCase() || 'LOW'] ?? 3)
-          )
+          .sort((a: any, b: any) => (SEV_ORDER[a.severity?.toUpperCase() || 'LOW'] ?? 3) - (SEV_ORDER[b.severity?.toUpperCase() || 'LOW'] ?? 3))
           .map((f: any, i: number) => ({
             id: String(i),
             title: probeName(f.probe_name || 'Unknown Probe'),
             severity: (f.severity || 'LOW').toUpperCase(),
             category: f.owasp_llm_category || '—',
             source: f.source || 'scanner',
-            probe: f.probe_name || '',
           }));
-
         setAlerts(mapped);
-      } catch {
-        // API not running — empty state
-      } finally {
-        setLoading(false);
-      }
+      } catch { /* API not running */ }
+      finally { setLoading(false); }
     }
     load();
   }, []);
@@ -74,12 +59,13 @@ export default function AlertsFeed() {
           <AlertTriangle size={15} style={{ color: '#FF2D55' }} />
           <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Scan Findings</h3>
           {criticalCount > 0 && (
-            <span
+            <motion.span
+              initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 400 }}
               className="text-xs font-bold px-1.5 py-0.5 rounded-full"
               style={{ background: '#FF2D55', color: '#fff', fontSize: '10px', boxShadow: '0 0 8px rgba(255,45,85,0.5)' }}
             >
               {criticalCount}
-            </span>
+            </motion.span>
           )}
         </div>
         <div className="flex items-center gap-1">
@@ -104,80 +90,60 @@ export default function AlertsFeed() {
       {/* Feed */}
       <div className="flex-1 overflow-y-auto space-y-2" style={{ maxHeight: 340 }}>
         {loading && (
-          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
-            Loading findings…
-          </p>
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>Loading findings…</p>
         )}
         {!loading && filtered.length === 0 && (
-          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
-            No findings. Run a scan to populate.
-          </p>
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>No findings. Run a scan to populate.</p>
         )}
-        {filtered.map((alert, i) => {
-          const cfg = SEV_CONFIG[alert.severity] || SEV_CONFIG.LOW;
-          const Icon = cfg.icon;
-          return (
-            <div
-              key={alert.id}
-              className="flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all duration-200 group"
-              style={{
-                background: cfg.bg,
-                border: `1px solid ${cfg.border}`,
-                animation: `alert-slide 0.4s ease-out ${i * 40}ms both`,
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.filter = 'brightness(1.15)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.filter = '';
-              }}
-            >
-              <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40` }}
+        <AnimatePresence>
+          {filtered.map((alert, i) => {
+            const cfg = SEV_CONFIG[alert.severity] || SEV_CONFIG.LOW;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const Icon = cfg.icon as any;
+            const isCritical = alert.severity === 'CRITICAL';
+            return (
+              <motion.div
+                key={alert.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
+                whileHover={{ x: 2, transition: { duration: 0.15 } }}
+                className="flex items-start gap-3 p-3 rounded-lg cursor-pointer group"
+                style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
               >
-                <Icon size={13} style={{ color: cfg.color }} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm font-medium truncate" style={{ color: '#E2E8F0' }}>
-                    {alert.title}
-                  </p>
-                  <ChevronRight
-                    size={12}
-                    style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }}
-                    className="group-hover:translate-x-0.5 transition-transform"
-                  />
+                <div
+                  className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{
+                    background: `${cfg.color}20`,
+                    border: `1px solid ${cfg.color}40`,
+                    animation: isCritical ? `counter-pulse 2s ease-in-out infinite` : 'none',
+                  }}
+                >
+                  <Icon size={13} style={{ color: cfg.color }} />
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span
-                    className="text-xs font-semibold px-1.5 py-0.5 rounded"
-                    style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: '10px' }}
-                  >
-                    {cfg.label}
-                  </span>
-                  <span className="text-xs" style={{ color: 'rgba(148,163,184,0.6)', fontSize: '10px' }}>
-                    {alert.category}
-                  </span>
-                  <span className="text-xs ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: '10px' }}>
-                    {alert.source}
-                  </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-medium truncate" style={{ color: '#E2E8F0' }}>{alert.title}</p>
+                    <ChevronRight size={12} style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }} className="group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs font-semibold px-1.5 py-0.5 rounded" style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: '10px' }}>
+                      {cfg.label}
+                    </span>
+                    <span className="text-xs" style={{ color: 'rgba(148,163,184,0.6)', fontSize: '10px' }}>{alert.category}</span>
+                    <span className="text-xs ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: '10px' }}>{alert.source}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
       </div>
 
       {/* Footer */}
-      <button
-        className="w-full py-2 text-xs font-medium rounded-lg transition-colors"
-        style={{
-          background: 'rgba(0,212,255,0.06)',
-          border: '1px solid rgba(0,212,255,0.15)',
-          color: '#00D4FF',
-        }}
-      >
+      <button className="w-full py-2 text-xs font-medium rounded-lg transition-colors"
+        style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)', color: '#00D4FF' }}>
         View All {alerts.length} Findings
       </button>
     </div>

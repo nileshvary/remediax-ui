@@ -109,7 +109,7 @@ export default function ThreatLandscape() {
           }
         }
 
-        function toChartData(counts: Record<string, number>, meta: Record<string, OWASPEntry>): ChartItem[] {
+        const toChartData = (counts: Record<string, number>, meta: Record<string, OWASPEntry>): ChartItem[] => {
           const totalCount = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
           return Object.entries(counts)
             .sort((a, b) => b[1] - a[1])
@@ -120,7 +120,7 @@ export default function ThreatLandscape() {
               value: Math.round((count / totalCount) * 100),
               count,
             }));
-        }
+        };
 
         const llmData = toChartData(llmCounts, owasp.llm);
         const asiData = toChartData(asiCounts, owasp.asi);
