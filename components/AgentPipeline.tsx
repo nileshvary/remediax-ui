@@ -69,8 +69,22 @@ type NodeDef = {
   Icon: React.ElementType;
 };
 
+const MARCH_DUR: Record<string, number> = {
+  a1: 3,
+  a2: 2.5,
+  a3: 3.5,
+  a4: 3,
+};
+
+// Reporter gets purple marching ants to match Palo Alto style
+const MARCH_COLOR: Record<string, string> = {
+  a3: '#A78BFA',
+};
+
 function NodeCard({ n, glowId }: { n: NodeDef; glowId: string }) {
   const Icon = n.Icon;
+  const marchDur  = MARCH_DUR[n.id]  ?? 3;
+  const marchColor = MARCH_COLOR[n.id] ?? n.color;
   return (
     <motion.g
       style={{ transformBox: 'fill-box' as React.CSSProperties['transformBox'], transformOrigin: 'center' }}
@@ -82,10 +96,10 @@ function NodeCard({ n, glowId }: { n: NodeDef; glowId: string }) {
         fill={n.color} fillOpacity="0.06"
         stroke={n.color} strokeWidth="1" strokeOpacity="0.0"
         filter={`url(#${glowId})`} />
-      {/* Glass card — solid border (no dasharray) */}
+      {/* Glass card — no static border, animated dotted border handles it */}
       <rect x={n.x} y={n.y} width={n.w} height={n.h} rx={10}
         fill="#04050d"
-        stroke={n.color} strokeWidth="1.5" strokeOpacity="0.85" />
+        stroke="none" />
       {/* Top highlight */}
       <rect x={n.x + 12} y={n.y + 1} width={n.w - 24} height={1} rx={1}
         fill="white" fillOpacity="0.06" />
@@ -110,6 +124,14 @@ function NodeCard({ n, glowId }: { n: NodeDef; glowId: string }) {
         fontSize="7.5" fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.65">
         {n.sub}
       </text>
+      {/* Marching ants — travels clockwise continuously */}
+      <rect x={n.x} y={n.y} width={n.w} height={n.h} rx={10}
+        fill="none"
+        stroke={marchColor}
+        strokeWidth="1"
+        strokeDasharray="6 4"
+        strokeOpacity="0.85"
+        style={{ animation: `marching-ants ${marchDur}s linear infinite` }} />
     </motion.g>
   );
 }
@@ -378,6 +400,15 @@ export default function AgentPipeline() {
               strokeWidth="2"
               opacity="1" />
 
+            {/* Broad purple dotted circle orbiting the hexagon — 2s clockwise */}
+            <circle cx={ORC.cx} cy={ORC.cy} r="70"
+              fill="none"
+              stroke="#9333EA"
+              strokeWidth="2"
+              strokeDasharray="10 6"
+              strokeOpacity="0.80"
+              style={{ animation: 'marching-ants 2s linear infinite' }} />
+
             {/* Glass top-edge highlights */}
             <line x1="390" y1="108" x2="444" y2="139"
               stroke="white" strokeWidth="0.7" strokeOpacity="0.08"/>
@@ -425,6 +456,16 @@ export default function AgentPipeline() {
       {/* ── CVE Watcher Banner ── */}
       <div className="relative flex-shrink-0"
         style={{ background: '#050810', borderTop: '1px solid rgba(34,197,94,0.1)' }}>
+        {/* Marching ants border — full banner perimeter, 4s (nightly rhythm) */}
+        <svg style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none', overflow:'hidden' }}>
+          <rect x="1" y="1" width="99%" height="97%"
+            fill="none"
+            stroke="#00FF88"
+            strokeWidth="1"
+            strokeDasharray="6 4"
+            strokeOpacity="0.45"
+            style={{ animation: 'marching-ants 4s linear infinite' }} />
+        </svg>
         <div className="flex items-start gap-4 px-5 pt-4 pb-2">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
             style={{ background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.18)' }}>
