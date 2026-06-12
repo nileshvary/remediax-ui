@@ -1,8 +1,5 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'RemediAX - Enterprise AI Security Dashboard',
@@ -16,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={inter.className} style={{ backgroundColor: '#0A0F1E' }}>
+      <body style={{ backgroundColor: '#0A0F1E', fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif' }}>
         {children}
       </body>
     </html>
