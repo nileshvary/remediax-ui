@@ -8,20 +8,29 @@ const VBW = 780;
 const VBH = 292;
 
 const CONNECTIONS = [
-  { id: 'ap0', d: 'M144,148 C222,148 224,52 316,52',      color: '#06B6D4', dots: 3 },
+  // Agent 5 (Orchestrator) → Agent 1 (Scanner) — Orchestrator triggers Scanner
+  { id: 'ap0', d: 'M322,52 C222,52 200,148 144,148',      color: '#7C3AED', dots: 3 },
+  // Agent 5 → Agent 2 (Orchestrator coordinates Remediator)
   { id: 'ap1', d: 'M390,92 L390,107',                      color: '#7C3AED', dots: 2 },
+  // Agent 5 → Agent 3 (Orchestrator coordinates Reporter)
   { id: 'ap2', d: 'M316,65 C213,95 213,242 325,242',       color: '#7C3AED', dots: 3 },
+  // Agent 2 (Remediator) → Agent 4 (Verifier)
   { id: 'ap3', d: 'M468,148 L636,148',                     color: '#F59E0B', dots: 3 },
+  // Agent 3 (Reporter) → Agent 4 (Verifier)
   { id: 'ap4', d: 'M455,242 C558,242 648,207 701,184',     color: '#3B82F6', dots: 3 },
-  { id: 'ap5', d: 'M701,186 L701,292',                     color: '#22C55E', dots: 2 },
+  // Agent 6 (CVE Watcher) → Agent 1 (Scanner) — nightly direct rescan, bypasses Agent 5
+  { id: 'ap6', d: 'M82,292 L82,180',                       color: '#22C55E', dots: 2 },
 ];
 
 const ARROWS: [string, string][] = [
-  ['312,46 316,52 312,58',    '#06B6D4'],
+  // Into Agent 1 from Agent 5 (arrow on Agent 1's right side)
+  ['148,142 144,148 148,154', '#7C3AED'],
   ['384,103 390,107 396,103', '#7C3AED'],
   ['319,246 325,242 331,246', '#7C3AED'],
   ['632,142 636,148 632,154', '#F59E0B'],
   ['697,188 701,184 697,180', '#3B82F6'],
+  // Into Agent 1 from Agent 6 (arrow pointing up into Agent 1 bottom)
+  ['78,184 82,180 86,184',    '#22C55E'],
 ];
 
 const CARDS = [
@@ -33,11 +42,11 @@ const CARDS = [
 ];
 
 const LEGEND = [
-  { color:'#06B6D4', label:'Scanning' },
   { color:'#7C3AED', label:'Orchestrating' },
+  { color:'#06B6D4', label:'Scanning' },
   { color:'#F59E0B', label:'Remediating' },
   { color:'#3B82F6', label:'Reporting' },
-  { color:'#22C55E', label:'Verified' },
+  { color:'#22C55E', label:'Verified / Nightly CVE' },
 ];
 
 const STATS = [
@@ -50,7 +59,7 @@ const STATS = [
 
 export default function AgentPipeline() {
   const svgPad = `${((VBH / VBW) * 100).toFixed(2)}%`;
-  const a4xPct = `${((701 / VBW) * 100).toFixed(2)}%`;
+  const a1xPct = `${((82 / VBW) * 100).toFixed(2)}%`;
 
   return (
     <div
@@ -150,7 +159,7 @@ export default function AgentPipeline() {
 
       {/* CVE Watcher */}
       <div className="relative flex-shrink-0" style={{ background: '#0D1424', borderTop: '1px solid #334155' }}>
-        <div className="absolute top-0 w-px" style={{ left: a4xPct, height: 12, background: 'repeating-linear-gradient(to bottom,#22C55E 0 3px,transparent 3px 6px)', opacity: 0.55 }} />
+        <div className="absolute top-0 w-px" style={{ left: a1xPct, height: 12, background: 'repeating-linear-gradient(to bottom,#22C55E 0 3px,transparent 3px 6px)', opacity: 0.55 }} />
         <div className="flex items-start gap-4 px-5 pt-4 pb-2">
           <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }}>
             <Clock size={16} style={{ color: '#22C55E' }} />
