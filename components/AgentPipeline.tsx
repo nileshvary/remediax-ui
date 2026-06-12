@@ -42,15 +42,15 @@ interface NodeDef {
 
 const NODES: NodeDef[] = [
   // Left arm — Agent 1 Scanner
-  { id: 'a1', nx: 14, ny: 110, nw: 130, nh: 76, cx: 79, cy: 148, color: '#06B6D4', title: 'Agent 1', sub: 'Scanner', tool: 'Garak + PyRIT' },
-  // Top arm — Agent 5 Orchestrator (slightly larger)
-  { id: 'a5', nx: 316, ny: 12, nw: 148, nh: 80, cx: 390, cy: 52, color: '#7C3AED', title: 'Agent 5', sub: 'Orchestrator', tool: 'Claude API Brain' },
-  // Center hub — Agent 2 Remediator (largest)
-  { id: 'a2', nx: 312, ny: 107, nw: 156, nh: 83, cx: 390, cy: 148, color: '#F59E0B', title: 'Agent 2', sub: 'Remediator', tool: 'LLM Guard + NeMo' },
+  { id: 'a1', nx: 18, ny: 116, nw: 118, nh: 64, cx: 77, cy: 148, color: '#06B6D4', title: 'Agent 1', sub: 'Scanner', tool: 'Garak + PyRIT' },
+  // Top arm — Agent 5 Orchestrator
+  { id: 'a5', nx: 322, ny: 16, nw: 136, nh: 68, cx: 390, cy: 50, color: '#7C3AED', title: 'Agent 5', sub: 'Orchestrator', tool: 'Claude API Brain' },
+  // Center hub — Agent 2 Remediator (slightly larger)
+  { id: 'a2', nx: 318, ny: 112, nw: 144, nh: 72, cx: 390, cy: 148, color: '#F59E0B', title: 'Agent 2', sub: 'Remediator', tool: 'LLM Guard + NeMo' },
   // Bottom arm — Agent 3 Reporter
-  { id: 'a3', nx: 325, ny: 204, nw: 130, nh: 76, cx: 390, cy: 242, color: '#3B82F6', title: 'Agent 3', sub: 'Reporter', tool: 'Claude + Jinja2' },
+  { id: 'a3', nx: 329, ny: 208, nw: 122, nh: 64, cx: 390, cy: 240, color: '#3B82F6', title: 'Agent 3', sub: 'Reporter', tool: 'Claude + Jinja2' },
   // Right arm — Agent 4 Verifier
-  { id: 'a4', nx: 636, ny: 110, nw: 130, nh: 76, cx: 701, cy: 148, color: '#22C55E', title: 'Agent 4', sub: 'Verifier', tool: 'Promptfoo CI' },
+  { id: 'a4', nx: 640, ny: 116, nw: 118, nh: 64, cx: 699, cy: 148, color: '#22C55E', title: 'Agent 4', sub: 'Verifier', tool: 'Promptfoo CI' },
 ];
 
 // ─── Connections ──────────────────────────────────────────────────────────────
@@ -141,42 +141,46 @@ function IconVerifier({ cx, cy, color }: { cx: number; cy: number; color: string
 function NodeCard({ n }: { n: NodeDef }) {
   const isHub = n.id === 'a2';
   const isLg = n.id === 'a5' || isHub;
-  const iconCY = n.ny + (isLg ? 21 : 19);
-  const titleY = n.ny + (isLg ? 39 : 37);
-  const subY = n.ny + (isLg ? 52 : 50);
-  const badgeY = n.ny + n.nh - 11;
+  const iconCY = n.ny + 16;
+  const titleY  = n.ny + 31;
+  const subY    = n.ny + 42;
+  const badgeY  = n.ny + n.nh - 9;
 
   return (
     <g>
       {/* Card fill */}
-      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="10" fill="#1a1f35" />
-      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="10" fill={n.color} fillOpacity="0.04" />
+      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="8" fill="#0f1523" />
+      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="8" fill={n.color} fillOpacity="0.05" />
       {/* Border */}
-      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="10" fill="none" stroke={n.color}
-        strokeWidth={isHub ? 1.5 : isLg ? 1.3 : 1} strokeOpacity={isHub ? 1 : isLg ? 0.85 : 0.65} />
+      <rect x={n.nx} y={n.ny} width={n.nw} height={n.nh} rx="8" fill="none" stroke={n.color}
+        strokeWidth={isHub ? 1.4 : isLg ? 1.2 : 0.9}
+        strokeOpacity={isHub ? 0.9 : isLg ? 0.75 : 0.55} />
       {/* Icon */}
       {n.id === 'a1' && <IconScanner cx={n.cx} cy={iconCY} color={n.color} />}
       {n.id === 'a5' && <IconOrchestrator cx={n.cx} cy={iconCY} color={n.color} />}
       {n.id === 'a2' && <IconRemediator cx={n.cx} cy={iconCY} color={n.color} />}
       {n.id === 'a3' && <IconReporter cx={n.cx} cy={iconCY} color={n.color} />}
       {n.id === 'a4' && <IconVerifier cx={n.cx} cy={iconCY} color={n.color} />}
-      {/* Title */}
-      <text x={n.cx} y={titleY} textAnchor="middle" dominantBaseline="middle" fill="#FFFFFF"
-        fontSize={isHub ? 13 : 12} fontWeight="700" fontFamily="Inter, ui-sans-serif, sans-serif">
+      {/* Title — e.g. "Agent 1" */}
+      <text x={n.cx} y={titleY} textAnchor="middle" dominantBaseline="middle"
+        fill="#CBD5E1" fontSize={isHub ? 9 : 8.5} fontWeight="600"
+        fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.3">
         {n.title}
       </text>
-      {/* Subtitle */}
-      <text x={n.cx} y={subY} textAnchor="middle" dominantBaseline="middle" fill="#64748B"
-        fontSize="10" fontFamily="Inter, ui-sans-serif, sans-serif">
+      {/* Subtitle — e.g. "Scanner" */}
+      <text x={n.cx} y={subY} textAnchor="middle" dominantBaseline="middle"
+        fill="#F1F5F9" fontSize={isHub ? 10.5 : 9.5} fontWeight="700"
+        fontFamily="Inter, ui-sans-serif, sans-serif">
         {n.sub}
       </text>
       {/* Tool badge */}
       {n.tool && (
         <g>
-          <rect x={n.nx + 8} y={badgeY - 7} width={n.nw - 16} height="14" rx="3"
-            fill={n.color} fillOpacity="0.1" stroke={n.color} strokeWidth="0.5" strokeOpacity="0.3" />
+          <rect x={n.nx + 7} y={badgeY - 6} width={n.nw - 14} height="12" rx="3"
+            fill={n.color} fillOpacity="0.1" stroke={n.color} strokeWidth="0.4" strokeOpacity="0.35" />
           <text x={n.cx} y={badgeY} textAnchor="middle" dominantBaseline="middle"
-            fill={n.color} fontSize="7.5" fillOpacity="0.9" fontFamily="Inter, ui-sans-serif, sans-serif">
+            fill={n.color} fontSize="6.5" fillOpacity="0.95"
+            fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.2">
             {n.tool}
           </text>
         </g>
