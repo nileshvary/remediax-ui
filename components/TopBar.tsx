@@ -1,11 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, Puzzle, Bell, ChevronDown, Shield } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Play, Bell, ChevronDown, Shield } from 'lucide-react';
 import RemediAXLogo from './RemediAXLogo';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
+
+type ProtectedStatus = 'protected' | 'unprotected' | 'unknown';
 
 export default function TopBar() {
   const [searchFocused, setSearchFocused] = useState(false);
+  const [status, setStatus] = useState<ProtectedStatus>('unknown');
+
+  useEffect(() => {
+    fetch(`${API}/api/guardrails`)
+      .then(r => r.json())
+      .then((g: any) => {
+        const count = (g.input_guardrails?.length || 0) + (g.output_guardrails?.length || 0);
+        setStatus(count > 0 ? 'protected' : 'unprotected');
+      })
+      .catch(() => setStatus('unknown'));
+  }, []);
+
+  const statusConfig = {
+    protected:   { color: '#00FF87', bg: 'rgba(0,255,135,0.08)',  border: 'rgba(0,255,135,0.2)',  label: 'Protected'   },
+    unprotected: { color: '#FF8C00', bg: 'rgba(255,140,0,0.08)',  border: 'rgba(255,140,0,0.2)',  label: 'Unprotected' },
+    unknown:     { color: 'rgba(148,163,184,0.6)', bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.1)', label: 'Unknown' },
+  };
+  const s = statusConfig[status];
 
   return (
     <header
@@ -34,12 +56,9 @@ export default function TopBar() {
         <Search size={14} style={{ color: 'rgba(148, 163, 184, 0.6)', flexShrink: 0 }} />
         <input
           type="text"
-          placeholder="Search threats, assets, reports..."
+          placeholder="Search findings, probes, guardrails..."
           className="flex-1 bg-transparent text-sm outline-none"
-          style={{
-            color: 'rgba(226, 232, 240, 0.9)',
-            caretColor: '#00D4FF',
-          }}
+          style={{ color: 'rgba(226, 232, 240, 0.9)', caretColor: '#00D4FF' }}
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
         />
@@ -58,54 +77,38 @@ export default function TopBar() {
 
       {/* Right side */}
       <div className="flex items-center gap-3 ml-auto">
-        {/* Integrations */}
+        {/* Run Scan */}
         <button
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
-          style={{
-            background: 'rgba(0, 212, 255, 0.08)',
-            border: '1px solid rgba(0, 212, 255, 0.2)',
-            color: '#00D4FF',
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.15)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.08)';
-          }}
+          style={{ background: 'rgba(0, 212, 255, 0.08)', border: '1px solid rgba(0, 212, 255, 0.2)', color: '#00D4FF' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.15)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.08)'; }}
         >
-          <Puzzle size={14} />
-          <span>Integrations</span>
+          <Play size={14} />
+          <span>Run Scan</span>
         </button>
 
-        {/* Status indicator */}
+        {/* Protected status — live from /api/guardrails */}
         <div
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
-          style={{
-            background: 'rgba(0, 255, 135, 0.08)',
-            border: '1px solid rgba(0, 255, 135, 0.2)',
-          }}
+          style={{ background: s.bg, border: `1px solid ${s.border}` }}
         >
-          <Shield size={13} style={{ color: '#00FF87' }} />
-          <span className="text-xs font-medium" style={{ color: '#00FF87' }}>Protected</span>
+          <Shield size={13} style={{ color: s.color }} />
+          <span className="text-xs font-medium" style={{ color: s.color }}>{s.label}</span>
         </div>
 
         {/* Notification bell */}
         <button className="relative p-2 rounded-lg transition-colors" style={{ color: 'rgba(148, 163, 184, 0.7)' }}>
           <Bell size={16} />
-          <span
-            className="absolute top-1 right-1 w-2 h-2 rounded-full"
-            style={{ background: '#FF2D55', boxShadow: '0 0 6px #FF2D55' }}
-          />
+          <span className="absolute top-1 right-1 w-2 h-2 rounded-full"
+            style={{ background: '#FF2D55', boxShadow: '0 0 6px #FF2D55' }} />
         </button>
 
         {/* User avatar */}
         <button className="flex items-center gap-2 group">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-            style={{
-              background: 'linear-gradient(135deg, #4169E1, #00D4FF)',
-              boxShadow: '0 0 12px rgba(0, 212, 255, 0.4)',
-            }}
+            style={{ background: 'linear-gradient(135deg, #4169E1, #00D4FF)', boxShadow: '0 0 12px rgba(0, 212, 255, 0.4)' }}
           >
             A
           </div>
