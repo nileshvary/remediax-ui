@@ -47,7 +47,7 @@ export default function AlertsFeed() {
   const criticalCount = alerts.filter(a => a.severity === 'CRITICAL' || a.severity === 'HIGH').length;
 
   return (
-    <div className="glass-card p-3 flex flex-col gap-2 h-full" style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}>
+    <div className="glass-card p-3 flex flex-col gap-2" style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}>
 
       {/* Header */}
       <div className="flex items-center gap-2">
