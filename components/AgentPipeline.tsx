@@ -163,24 +163,24 @@ function NodeCard({ n }: { n: NodeDef }) {
       {n.id === 'a4' && <IconVerifier cx={n.cx} cy={iconCY} color={n.color} />}
       {/* Title — e.g. "Agent 1" */}
       <text x={n.cx} y={titleY} textAnchor="middle" dominantBaseline="middle"
-        fill="#CBD5E1" fontSize={isHub ? 9 : 8.5} fontWeight="600"
-        fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.3">
+        fill="#94A3B8" fontSize={isHub ? 7 : 6.5} fontWeight="500"
+        fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.4">
         {n.title}
       </text>
       {/* Subtitle — e.g. "Scanner" */}
       <text x={n.cx} y={subY} textAnchor="middle" dominantBaseline="middle"
-        fill="#F1F5F9" fontSize={isHub ? 10.5 : 9.5} fontWeight="700"
+        fill="#E2E8F0" fontSize={isHub ? 8.5 : 7.5} fontWeight="700"
         fontFamily="Inter, ui-sans-serif, sans-serif">
         {n.sub}
       </text>
       {/* Tool badge */}
       {n.tool && (
         <g>
-          <rect x={n.nx + 7} y={badgeY - 6} width={n.nw - 14} height="12" rx="3"
+          <rect x={n.nx + 7} y={badgeY - 5} width={n.nw - 14} height="10" rx="2.5"
             fill={n.color} fillOpacity="0.1" stroke={n.color} strokeWidth="0.4" strokeOpacity="0.35" />
           <text x={n.cx} y={badgeY} textAnchor="middle" dominantBaseline="middle"
-            fill={n.color} fontSize="6.5" fillOpacity="0.95"
-            fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.2">
+            fill={n.color} fontSize="5.5" fillOpacity="0.9"
+            fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.15">
             {n.tool}
           </text>
         </g>
