@@ -42,7 +42,7 @@ export default function Dashboard() {
                 AI Threat Intelligence Center
               </h1>
               <p className="text-sm mt-0.5" style={{ color: 'rgba(148,163,184,0.5)' }}>
-                Autonomous LLM security detection &amp; real-time remediation
+                Autonomous LLM security detection &amp; real-time remediation (Human-in-the-loop)
               </p>
             </div>
             <div className="flex items-center gap-2">
