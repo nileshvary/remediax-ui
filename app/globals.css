@@ -304,3 +304,17 @@ html, body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Topology node animations */
+@keyframes marching-ants {
+  to { stroke-dashoffset: -18; }
+}
+
+@keyframes hex-march {
+  to { stroke-dashoffset: -13; }
+}
+
+@keyframes node-glow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.9; }
+}
