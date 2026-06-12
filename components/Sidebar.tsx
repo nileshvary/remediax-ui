@@ -6,34 +6,30 @@ import RemediAXLogo from './RemediAXLogo';
 import {
   LayoutDashboard,
   Network,
-  Brain,
-  AlertTriangle,
-  Server,
-  ShieldAlert,
   BarChart3,
-  Zap,
   Settings,
   Bot,
-  Globe,
-  TrendingUp,
   Send,
   X,
+  Radar,
+  Shield,
+  FileText,
+  Clock,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
 const navItems = [
-  { icon: Globe, label: 'Overview', active: false },
-  { icon: LayoutDashboard, label: 'Dashboard', active: true },
-  { icon: Network, label: 'Network Monitor', active: false },
-  { icon: ShieldAlert, label: 'Threat Intelligence', active: false },
-  { icon: Brain, label: 'AI Insights', active: false },
-  { icon: AlertTriangle, label: 'Alerts', active: false, badge: 12 },
-  { icon: Server, label: 'Assets', active: false },
-  { icon: TrendingUp, label: 'Vulnerabilities', active: false },
-  { icon: BarChart3, label: 'Reports', active: false },
-  { icon: Zap, label: 'Automation', active: false },
-  { icon: Settings, label: 'Settings', active: false },
+  { icon: LayoutDashboard,    label: 'Dashboard',   active: true  },
+  { icon: Radar,              label: 'Scan',         active: false },
+  { icon: Shield,             label: 'Guardrails',   active: false },
+  { icon: FileText,           label: 'Reports',      active: false },
+  { icon: BarChart3,          label: 'Benchmark',    active: false },
+  { icon: Clock,              label: 'CVE Watcher',  active: false },
+  { icon: Network,            label: 'Pipeline',     active: false },
+  { icon: SlidersHorizontal,  label: 'Config',       active: false },
+  { icon: Settings,           label: 'Settings',     active: false },
 ];
 
 interface Message {
@@ -260,34 +256,63 @@ export default function Sidebar() {
           }}
           onClick={() => setChatOpen((o) => !o)}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <div className="relative">
-              <Bot size={16} style={{ color: '#A78BFA' }} />
-              <span
-                className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full"
-                style={{
-                  background: '#00FF87',
-                  boxShadow: '0 0 6px #00FF87',
-                  animation: 'blink 1.5s ease-in-out infinite',
-                }}
-              />
-            </div>
-            <span className="text-xs font-semibold" style={{ color: '#A78BFA' }}>
+          {/* Header row */}
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs font-semibold" style={{ color: '#F1F5F9' }}>
               AI Security Assistant
             </span>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full inline-block" style={{
+                background: '#00AAFF',
+                boxShadow: '0 0 5px #00AAFF',
+                animation: 'blink 1.5s ease-in-out infinite',
+              }} />
+              <span className="text-xs" style={{ color: '#00AAFF' }}>Online</span>
+            </div>
           </div>
-          <p className="text-xs leading-relaxed" style={{ color: 'rgba(148,163,184,0.7)' }}>
-            {chatOpen ? 'Click to collapse chat.' : 'Click to ask about threats, OWASP categories, or remediation.'}
+
+          {/* Subtitle */}
+          <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(148,163,184,0.6)' }}>
+            Ask me anything about your security posture...
           </p>
-          <div className="flex items-center gap-1.5 mt-2">
-            <div
-              className="w-1.5 h-1.5 rounded-full"
-              style={{
-                background: '#00FF87',
-                animation: 'pulse-dot 2s ease-in-out infinite',
-              }}
-            />
-            <span className="text-xs" style={{ color: '#00FF87' }}>Online</span>
+
+          {/* Orb */}
+          <div className="flex justify-center items-center py-1">
+            <div style={{ position: 'relative', width: 36, height: 36 }}>
+              {/* Outer rotating shimmer ring */}
+              <div style={{
+                position: 'absolute', inset: -6,
+                borderRadius: '50%',
+                background: 'conic-gradient(from 0deg, transparent 55%, rgba(139,92,246,0.65) 72%, rgba(96,165,250,0.85) 84%, transparent 100%)',
+                animation: 'orb-spin 3s linear infinite',
+                filter: 'blur(3px)',
+              }} />
+              {/* Counter-rotating mid ring */}
+              <div style={{
+                position: 'absolute', inset: -3,
+                borderRadius: '50%',
+                background: 'conic-gradient(from 180deg, transparent 58%, rgba(167,139,250,0.4) 72%, rgba(59,130,246,0.55) 84%, transparent 100%)',
+                animation: 'orb-spin 5s linear infinite reverse',
+                filter: 'blur(2px)',
+              }} />
+              {/* Core sphere */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                borderRadius: '50%',
+                background: 'radial-gradient(circle at 38% 35%, rgba(255,255,255,0.55) 0%, rgba(147,197,253,0.9) 18%, rgba(99,102,241,0.85) 45%, rgba(49,46,129,0.95) 72%, rgba(15,10,40,1) 100%)',
+                boxShadow: '0 0 18px rgba(139,92,246,0.55), 0 0 40px rgba(99,102,241,0.28), inset 0 0 20px rgba(0,0,0,0.4)',
+                animation: 'orb-breathe 3s ease-in-out infinite',
+              }} />
+              {/* Specular highlight */}
+              <div style={{
+                position: 'absolute', top: '16%', left: '22%',
+                width: '28%', height: '18%',
+                borderRadius: '50%',
+                background: 'radial-gradient(ellipse, rgba(255,255,255,0.55) 0%, transparent 100%)',
+                filter: 'blur(1px)',
+                pointerEvents: 'none',
+              }} />
+            </div>
           </div>
         </div>
       </div>

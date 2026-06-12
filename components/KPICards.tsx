@@ -21,7 +21,7 @@ interface KpiState {
 const DEFAULT_KPIS: KpiState[] = [
   { label: 'Security Posture',  value: '—', numericValue: 0,  unit: '/100', change: '—',            up: true,  icon: Shield,    color: '#00D4FF', shadowColor: 'rgba(0,212,255,0.18)',   trend: Array.from({length:9},(_,i)=>({v:50+i*4})) },
   { label: 'Threats Detected',  value: '—', numericValue: 0,  unit: '',     change: '—',            up: false, icon: Zap,       color: '#FF8C00', shadowColor: 'rgba(255,140,0,0.18)',   trend: Array.from({length:9},(_,i)=>({v:10+i*3})) },
-  { label: 'OWASP Categories',  value: '20',numericValue: 20, unit: '',     change: 'LLM + ASI',    up: true,  icon: Server,    color: '#4DA6FF', shadowColor: 'rgba(77,166,255,0.18)',  trend: Array.from({length:9},(_,i)=>({v:10+i*1.5})) },
+  { label: 'OWASP Coverage',    value: '—', numericValue: 0,  unit: '',     change: 'categories hit', up: true, icon: Server,    color: '#4DA6FF', shadowColor: 'rgba(77,166,255,0.18)',  trend: Array.from({length:9},(_,i)=>({v:10+i*1.5})) },
   { label: 'Critical Findings', value: '—', numericValue: 0,  unit: '',     change: '—',            up: false, icon: Database,  color: '#EF4444', shadowColor: 'rgba(239,68,68,0.18)',   trend: Array.from({length:9},(_,i)=>({v:5+i*2})) },
   { label: 'Guardrails Active', value: '—', numericValue: 0,  unit: '',     change: 'Auto-generated',up: true, icon: Activity,  color: '#00FF87', shadowColor: 'rgba(0,255,135,0.18)',  trend: Array.from({length:9},(_,i)=>({v:2+i*0.5})) },
 ];
@@ -48,7 +48,7 @@ function Counter({ target, suffix }: { target: number; suffix?: string }) {
   }, [target]);
 
   return (
-    <span className="text-2xl font-bold leading-none tabular-nums" style={{ color: '#E2E8F0' }}>
+    <span className="text-lg font-bold leading-none tabular-nums" style={{ color: '#E2E8F0' }}>
       {target === 0 ? '—' : display}{suffix}
     </span>
   );
@@ -61,19 +61,25 @@ export default function KPICards() {
   useEffect(() => {
     async function load() {
       try {
-        const [scoreRes, guardrailRes] = await Promise.all([
+        const [scoreRes, guardrailRes, findingsRes] = await Promise.all([
           fetch(`${API}/api/score`),
           fetch(`${API}/api/guardrails`),
+          fetch(`${API}/api/findings`),
         ]);
         const score: ScoreResponse = await scoreRes.json();
         const guardrails = await guardrailRes.json();
+        const findings = await findingsRes.json();
         const guardrailCount = (guardrails.input_guardrails?.length || 0) + (guardrails.output_guardrails?.length || 0);
+        const owaspCount = new Set(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (Array.isArray(findings) ? findings : []).map((f: any) => f.owasp_llm_category).filter(Boolean)
+        ).size;
 
         setKpis(prev => {
           const next = [...prev];
           next[0] = { ...next[0], value: String(Math.round(score.score)), numericValue: Math.round(score.score), change: score.label, up: score.score >= 50, trend: Array.from({length:9},(_,i)=>({v:Math.max(0,score.score-(8-i)*3)})) };
           next[1] = { ...next[1], value: String(score.finding_count), numericValue: score.finding_count, change: `${score.critical} critical`, up: false, trend: Array.from({length:9},(_,i)=>({v:Math.max(0,score.finding_count-(8-i)*3)})) };
-          next[2] = { ...next[2], value: '20', numericValue: 20, change: 'LLM + ASI' };
+          next[2] = { ...next[2], value: String(owaspCount), numericValue: owaspCount, change: `${owaspCount} categories hit`, up: owaspCount > 0 };
           next[3] = { ...next[3], value: String(score.critical+score.high), numericValue: score.critical+score.high, change: `${score.critical} crit / ${score.high} high`, up: false };
           next[4] = { ...next[4], value: String(guardrailCount), numericValue: guardrailCount, change: 'Auto-generated', up: guardrailCount > 0 };
           return next;
@@ -91,7 +97,7 @@ export default function KPICards() {
         return (
           <motion.div
             key={kpi.label}
-            className="glass-card p-4 flex flex-col gap-3 cursor-default"
+            className="glass-card p-2.5 flex flex-col gap-1.5 cursor-default"
             style={{
               boxShadow: `0 0 16px ${kpi.shadowColor}`,
               animation: `fade-in-up 0.5s ease-out ${i * 90}ms both`,
@@ -119,11 +125,11 @@ export default function KPICards() {
                 style={{ background: `${kpi.color}18`, border: `1px solid ${kpi.color}30` }}
                 whileHover={{ scale: 1.18, rotate: 6, transition: { type: 'spring', stiffness: 350 } }}
               >
-                <Icon size={16} style={{ color: kpi.color }} />
+                <Icon size={14} style={{ color: kpi.color }} />
               </motion.div>
             </div>
 
-            <div style={{ height: 40, marginLeft: -8, marginRight: -8 }}>
+            <div style={{ height: 24, marginLeft: -4, marginRight: -4 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={kpi.trend}>
                   <defs>

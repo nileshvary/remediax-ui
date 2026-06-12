@@ -22,7 +22,6 @@ function probeName(raw: string): string {
 
 export default function AlertsFeed() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [filter, setFilter] = useState<'All'|'CRITICAL'|'HIGH'|'MEDIUM'|'LOW'>('All');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,41 +44,40 @@ export default function AlertsFeed() {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = filter === 'All' ? alerts : alerts.filter(a => a.severity === filter);
   const criticalCount = alerts.filter(a => a.severity === 'CRITICAL' || a.severity === 'HIGH').length;
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3 h-full" style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}>
+    <div className="glass-card p-3 flex flex-col gap-2 h-full" style={{ animation: 'fade-in-up 0.5s ease-out 0.2s both' }}>
+
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <AlertTriangle size={15} style={{ color: '#FF2D55' }} />
-          <h3 className="font-semibold text-sm" style={{ color: '#E2E8F0' }}>Scan Findings</h3>
-          {criticalCount > 0 && (
-            <span className="text-xs font-bold px-1.5 py-0.5 rounded-full"
-              style={{ background: '#FF2D55', color: '#fff', fontSize: '10px', boxShadow: '0 0 8px rgba(255,45,85,0.5)', animation: 'counter-pulse 2s ease-in-out infinite' }}>
-              {criticalCount}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1">
-          {(['All','CRITICAL','HIGH','MEDIUM','LOW'] as const).map(f => (
-            <button key={f} onClick={() => setFilter(f)} className="text-xs px-2 py-0.5 rounded transition-all"
-              style={{ background: filter===f ? 'rgba(0,212,255,0.15)' : 'transparent', color: filter===f ? '#00D4FF' : 'rgba(148,163,184,0.5)', border: filter===f ? '1px solid rgba(0,212,255,0.3)' : '1px solid transparent', fontSize:'10px' }}>
-              {f === 'All' ? 'All' : f[0] + f.slice(1).toLowerCase()}
-            </button>
-          ))}
-        </div>
+      <div className="flex items-center gap-2">
+        <AlertTriangle size={14} style={{ color: '#FF2D55' }} />
+        <h3 className="font-bold" style={{ color: '#E2E8F0', fontSize: 14 }}>Scan Findings</h3>
+        {criticalCount > 0 && (
+          <span className="font-bold px-2 py-0.5 rounded-full"
+            style={{ background: '#FF2D55', color: '#fff', fontSize: 11,
+                     boxShadow: '0 0 8px rgba(255,45,85,0.5)',
+                     animation: 'counter-pulse 2s ease-in-out infinite' }}>
+            {criticalCount}
+          </span>
+        )}
       </div>
 
       {/* Feed */}
-      <div className="flex-1 overflow-y-auto space-y-2" style={{ maxHeight: 340 }}>
-        {loading && <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>Loading findings…</p>}
-        {!loading && filtered.length === 0 && <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>No findings. Run a scan to populate.</p>}
+      <div className="flex-1 overflow-y-auto space-y-1.5" style={{ maxHeight: 280 }}>
+        {loading && (
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+            Loading findings…
+          </p>
+        )}
+        {!loading && alerts.length === 0 && (
+          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+            No findings. Run a scan to populate.
+          </p>
+        )}
         <AnimatePresence mode="popLayout">
-          {filtered.map((alert, i) => {
+          {alerts.map((alert, i) => {
             const cfg = SEV_CONFIG[alert.severity] || SEV_CONFIG.LOW;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const Icon = cfg.icon as any;
             return (
               <motion.div
@@ -89,22 +87,34 @@ export default function AlertsFeed() {
                 exit={{ opacity: 0, x: -8 }}
                 transition={{ duration: 0.25, delay: i * 0.04 }}
                 whileHover={{ x: 2, transition: { duration: 0.12 } }}
-                className="flex items-start gap-3 p-3 rounded-lg cursor-pointer group"
+                className="flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer group"
                 style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
               >
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
-                  style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40`, animation: alert.severity==='CRITICAL' ? 'counter-pulse 2s ease-in-out infinite' : 'none' }}>
+                {/* Severity icon */}
+                <div className="w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5"
+                  style={{ background: `${cfg.color}20`, border: `1px solid ${cfg.color}40`,
+                           animation: alert.severity === 'CRITICAL' ? 'counter-pulse 2s ease-in-out infinite' : 'none' }}>
                   <Icon size={13} style={{ color: cfg.color }} />
                 </div>
+
+                {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-medium truncate" style={{ color: '#E2E8F0' }}>{alert.title}</p>
-                    <ChevronRight size={12} style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }} className="group-hover:translate-x-0.5 transition-transform" />
+                    <p className="font-semibold truncate" style={{ color: '#E2E8F0', fontSize: 13 }}>
+                      {alert.title}
+                    </p>
+                    <ChevronRight size={12} style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }}
+                      className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs font-semibold px-1.5 py-0.5 rounded" style={{ background:`${cfg.color}18`, color:cfg.color, fontSize:'10px' }}>{cfg.label}</span>
-                    <span className="text-xs" style={{ color:'rgba(148,163,184,0.6)', fontSize:'10px' }}>{alert.category}</span>
-                    <span className="text-xs ml-auto capitalize" style={{ color:'rgba(148,163,184,0.4)', fontSize:'10px' }}>{alert.source}</span>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="font-semibold px-1.5 py-0.5 rounded"
+                      style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: 10 }}>
+                      {cfg.label}
+                    </span>
+                    <span style={{ color: 'rgba(148,163,184,0.6)', fontSize: 10 }}>{alert.category}</span>
+                    <span className="ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: 10 }}>
+                      {alert.source}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -113,8 +123,10 @@ export default function AlertsFeed() {
         </AnimatePresence>
       </div>
 
-      <button className="w-full py-2 text-xs font-medium rounded-lg transition-colors"
-        style={{ background:'rgba(0,212,255,0.06)', border:'1px solid rgba(0,212,255,0.15)', color:'#00D4FF' }}>
+      {/* Footer */}
+      <button className="w-full py-2 font-medium rounded-lg transition-colors"
+        style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)',
+                 color: '#00D4FF', fontSize: 12 }}>
         View All {alerts.length} Findings
       </button>
     </div>
