@@ -10,26 +10,34 @@ const VBH = 292;
 const CONNECTIONS = [
   // Agent 5 (Orchestrator) → Agent 1 (Scanner) — Orchestrator triggers Scanner
   { id: 'ap0', d: 'M322,52 C222,52 200,148 144,148',      color: '#7C3AED', dots: 3 },
-  // Agent 5 → Agent 2 (Orchestrator coordinates Remediator)
+  // Agent 5 → Agent 2 (Orchestrator also coordinates Remediator directly)
   { id: 'ap1', d: 'M390,92 L390,107',                      color: '#7C3AED', dots: 2 },
-  // Agent 5 → Agent 3 (Orchestrator coordinates Reporter)
-  { id: 'ap2', d: 'M316,65 C213,95 213,242 325,242',       color: '#7C3AED', dots: 3 },
+  // Agent 1 (Scanner) → Agent 2 (Remediator) — findings.json data flow
+  { id: 'ap7', d: 'M136,148 L318,148',                     color: '#06B6D4', dots: 3 },
+  // Agent 2 (Remediator) → Agent 3 (Reporter) — remediation results feed Reporter
+  { id: 'ap8', d: 'M390,184 L390,208',                     color: '#F59E0B', dots: 2 },
   // Agent 2 (Remediator) → Agent 4 (Verifier)
   { id: 'ap3', d: 'M468,148 L636,148',                     color: '#F59E0B', dots: 3 },
-  // Agent 3 (Reporter) → Agent 4 (Verifier)
+  // Agent 3 (Reporter) → Agent 4 (Verifier) — summary.html feeds Verifier
   { id: 'ap4', d: 'M455,242 C558,242 648,207 701,184',     color: '#3B82F6', dots: 3 },
   // Agent 6 (CVE Watcher) → Agent 1 (Scanner) — nightly direct rescan, bypasses Agent 5
   { id: 'ap6', d: 'M82,292 L82,180',                       color: '#22C55E', dots: 2 },
 ];
 
 const ARROWS: [string, string][] = [
-  // Into Agent 1 from Agent 5 (arrow on Agent 1's right side)
+  // Into Agent 1 from Agent 5
   ['148,142 144,148 148,154', '#7C3AED'],
+  // Into Agent 2 from Agent 5 (downward)
   ['384,103 390,107 396,103', '#7C3AED'],
-  ['319,246 325,242 331,246', '#7C3AED'],
+  // Into Agent 2 from Agent 1 (findings.json, left side of Agent 2)
+  ['314,142 318,148 314,154', '#06B6D4'],
+  // Into Agent 3 from Agent 2 (downward)
+  ['384,204 390,208 396,204', '#F59E0B'],
+  // Into Agent 4 from Agent 2 (rightward)
   ['632,142 636,148 632,154', '#F59E0B'],
+  // Into Agent 4 from Agent 3 (curved)
   ['697,188 701,184 697,180', '#3B82F6'],
-  // Into Agent 1 from Agent 6 (arrow pointing up into Agent 1 bottom)
+  // Into Agent 1 from Agent 6 (upward, nightly CVE rescan)
   ['78,184 82,180 86,184',    '#22C55E'],
 ];
 
