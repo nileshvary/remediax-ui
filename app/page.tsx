@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
 import TopBar from '../components/TopBar';
 import Sidebar from '../components/Sidebar';
@@ -12,38 +12,55 @@ import AIInsights from '../components/AIInsights';
 import TopAttackedAssets from '../components/TopAttackedAssets';
 import TrafficOverview from '../components/TrafficOverview';
 import SecurityPostureTrend from '../components/SecurityPostureTrend';
+import ConfigTab from '../components/ConfigTab';
 import { Calendar, RefreshCw } from 'lucide-react';
 
-// Load Three.js particle background client-side only (no SSR — avoids WebGL/window errors)
 const ParticleBackground = dynamic(() => import('../components/ParticleBackground'), { ssr: false });
 
+function PlaceholderTab({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-64 gap-3">
+      <div className="text-4xl">🚧</div>
+      <h2 className="text-lg font-semibold" style={{ color: '#E2E8F0' }}>{label}</h2>
+      <p className="text-sm" style={{ color: 'rgba(148,163,184,0.5)' }}>Coming next — being built step by step.</p>
+    </div>
+  );
+}
+
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState('Dashboard');
+
+  const TAB_TITLES: Record<string, { heading: string; sub: string }> = {
+    Dashboard:      { heading: 'AI Threat Intelligence Center', sub: 'Autonomous LLM security detection & real-time remediation (Human-in-the-loop)' },
+    Scan:           { heading: 'Scan',          sub: 'Trigger Agent 1 — run Garak + PyRIT probes against your LLM target' },
+    Guardrails:     { heading: 'Guardrails',    sub: 'Human-in-the-loop patch approval — review and apply remediation results' },
+    Reports:        { heading: 'Reports',       sub: 'Agent 3 output — HTML security report + PDF download' },
+    Benchmark:      { heading: 'Benchmark',     sub: 'Agent 4 verification — before/after improvement % and CI gate' },
+    'CVE Watcher':  { heading: 'CVE Watcher',   sub: 'Agent 6 — live CVE feed from NVD API + MITRE ATLAS' },
+    Pipeline:       { heading: 'Pipeline',      sub: 'Live 6-agent topology — Scanner → Remediator → Reporter → Verifier → Orchestrator → CVE Watcher' },
+    Config:         { heading: 'Config',        sub: 'Set your scan target, API keys, and scanner settings' },
+    Settings:       { heading: 'Settings',      sub: 'Application preferences' },
+  };
+
+  const title = TAB_TITLES[activeTab] ?? TAB_TITLES['Dashboard'];
+
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#0A0F1E', position: 'relative' }}>
-      {/* Three.js particle field — fixed behind everything */}
       <ParticleBackground />
 
-      {/* Sidebar */}
       <div style={{ position: 'relative', zIndex: 10 }}>
-        <Sidebar />
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
-        {/* Top bar */}
         <TopBar />
 
-        {/* Scrollable content */}
         <main className="flex-1 overflow-y-auto p-5 space-y-5" style={{ background: 'transparent' }}>
           {/* Page title bar */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold" style={{ color: '#E2E8F0' }}>
-                AI Threat Intelligence Center
-              </h1>
-              <p className="text-sm mt-0.5" style={{ color: 'rgba(148,163,184,0.5)' }}>
-                Autonomous LLM security detection &amp; real-time remediation (Human-in-the-loop)
-              </p>
+              <h1 className="text-xl font-bold" style={{ color: '#E2E8F0' }}>{title.heading}</h1>
+              <p className="text-sm mt-0.5" style={{ color: 'rgba(148,163,184,0.5)' }}>{title.sub}</p>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg"
@@ -59,27 +76,34 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* KPI Cards */}
-          <KPICards />
+          {/* Dashboard */}
+          {activeTab === 'Dashboard' && (
+            <>
+              <KPICards />
+              <div className="grid gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
+                <AgentPipeline />
+                <AlertsFeed />
+              </div>
+              <div className="grid grid-cols-3 gap-5">
+                <ThreatLandscape />
+                <AIInsights />
+                <TopAttackedAssets />
+              </div>
+              <div className="grid grid-cols-2 gap-5">
+                <TrafficOverview />
+                <SecurityPostureTrend />
+              </div>
+            </>
+          )}
 
-          {/* Pipeline + Alerts */}
-          <div className="grid gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
-            <AgentPipeline />
-            <AlertsFeed />
-          </div>
-
-          {/* Threat Landscape + AI Insights + Top Attacked */}
-          <div className="grid grid-cols-3 gap-5">
-            <ThreatLandscape />
-            <AIInsights />
-            <TopAttackedAssets />
-          </div>
-
-          {/* Charts row */}
-          <div className="grid grid-cols-2 gap-5">
-            <TrafficOverview />
-            <SecurityPostureTrend />
-          </div>
+          {activeTab === 'Pipeline'      && <AgentPipeline />}
+          {activeTab === 'Config'        && <ConfigTab />}
+          {activeTab === 'Scan'          && <PlaceholderTab label="Scan" />}
+          {activeTab === 'Guardrails'    && <PlaceholderTab label="Guardrails" />}
+          {activeTab === 'Reports'       && <PlaceholderTab label="Reports" />}
+          {activeTab === 'Benchmark'     && <PlaceholderTab label="Benchmark" />}
+          {activeTab === 'CVE Watcher'   && <PlaceholderTab label="CVE Watcher" />}
+          {activeTab === 'Settings'      && <PlaceholderTab label="Settings" />}
         </main>
       </div>
     </div>

@@ -20,7 +20,7 @@ import {
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
-const navItems = [
+const navItems: { icon: React.ElementType; label: string; active: boolean; badge?: number }[] = [
   { icon: LayoutDashboard,    label: 'Dashboard',   active: true  },
   { icon: Radar,              label: 'Scan',         active: false },
   { icon: Shield,             label: 'Guardrails',   active: false },
@@ -37,8 +37,12 @@ interface Message {
   text: string;
 }
 
-export default function Sidebar() {
-  const [activeItem, setActiveItem] = useState('Dashboard');
+interface SidebarProps {
+  activeTab: string;
+  onTabChange: (tab: string) => void;
+}
+
+export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', text: 'Hi! I\'m the RemediAX AI Security Assistant. Ask me about scan findings, OWASP LLM Top 10, ASI Agentic Top 10, or how to fix vulnerabilities.' },
@@ -108,11 +112,11 @@ export default function Sidebar() {
         <ul className="space-y-1 px-3">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeItem === item.label;
+            const isActive = activeTab === item.label;
             return (
               <li key={item.label}>
                 <motion.button
-                  onClick={() => setActiveItem(item.label)}
+                  onClick={() => onTabChange(item.label)}
                   className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium group relative"
                   style={{
                     background: isActive ? 'rgba(0, 212, 255, 0.12)' : 'transparent',
