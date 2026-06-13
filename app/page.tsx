@@ -31,9 +31,12 @@ function PlaceholderTab({ label }: { label: string }) {
 }
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState(() =>
-    (typeof window !== 'undefined' ? localStorage.getItem('remediax_active_tab') : null) ?? 'Dashboard'
-  );
+  const [activeTab, setActiveTab] = useState('Dashboard');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('remediax_active_tab');
+    if (saved) setActiveTab(saved);
+  }, []);
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
