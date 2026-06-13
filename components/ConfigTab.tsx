@@ -72,9 +72,10 @@ function InputField({ label, value, onChange, placeholder, type = 'text' }: {
   );
 }
 
-function MaskedKeyField({ label, fieldName, isSet, onSave }: {
+function MaskedKeyField({ label, fieldName, isSet, onSave, onDelete }: {
   label: string; fieldName: string; isSet: boolean;
   onSave: (field: string, value: string) => void;
+  onDelete: (field: string) => void;
 }) {
   const [show, setShow] = useState(false);
   const [value, setValue] = useState('');
@@ -84,10 +85,17 @@ function MaskedKeyField({ label, fieldName, isSet, onSave }: {
       <div className="flex items-center justify-between">
         <label className="text-xs font-medium" style={{ color: 'rgba(148,163,184,0.8)' }}>{label}</label>
         {isSet && (
-          <span className="text-xs px-2 py-0.5 rounded-full font-medium"
-            style={{ background: 'rgba(0,255,135,0.1)', color: '#00FF87', border: '1px solid rgba(0,255,135,0.2)' }}>
-            Set ✓
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{ background: 'rgba(0,255,135,0.1)', color: '#00FF87', border: '1px solid rgba(0,255,135,0.2)' }}>
+              Set ✓
+            </span>
+            <button onClick={() => onDelete(fieldName)}
+              className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full transition-colors"
+              style={{ background: 'rgba(255,45,85,0.08)', border: '1px solid rgba(255,45,85,0.2)', color: 'rgba(255,45,85,0.7)' }}>
+              <Trash2 size={10} /> Remove
+            </button>
+          </div>
         )}
       </div>
       <div className="flex gap-2">
@@ -181,6 +189,17 @@ export default function ConfigTab() {
     } catch { /* silent */ }
   }
 
+  async function deleteKey(field: string) {
+    try {
+      await fetch(`${API}/api/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [field]: '' }),
+      });
+      setCfg(c => ({ ...c, [`${field}_set`]: false }));
+    } catch { /* silent */ }
+  }
+
   async function saveCustomKey(idx: number) {
     const row = customRows[idx];
     if (!row.name.trim() || !row.value.trim()) return;
@@ -263,18 +282,14 @@ export default function ConfigTab() {
             fieldName="anthropic_api_key"
             isSet={cfg.anthropic_api_key_set}
             onSave={saveKey}
+            onDelete={deleteKey}
           />
           <MaskedKeyField
             label="OPENAI_API_KEY (optional — for OpenAI targets)"
             fieldName="openai_api_key"
             isSet={cfg.openai_api_key_set}
             onSave={saveKey}
-          />
-          <MaskedKeyField
-            label="MISTRAL_API_KEY (optional — for Mistral targets)"
-            fieldName="mistral_api_key"
-            isSet={cfg.mistral_api_key_set}
-            onSave={saveKey}
+            onDelete={deleteKey}
           />
 
           {/* Custom keys */}
