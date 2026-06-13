@@ -31,7 +31,14 @@ function PlaceholderTab({ label }: { label: string }) {
 }
 
 export default function Dashboard() {
-  const [activeTab, setActiveTab] = useState('Dashboard');
+  const [activeTab, setActiveTab] = useState(() =>
+    (typeof window !== 'undefined' ? localStorage.getItem('remediax_active_tab') : null) ?? 'Dashboard'
+  );
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    localStorage.setItem('remediax_active_tab', tab);
+  };
 
   const TAB_TITLES: Record<string, { heading: string; sub: string }> = {
     Dashboard:      { heading: 'AI Threat Intelligence Center', sub: 'Autonomous LLM security detection & real-time remediation (Human-in-the-loop)' },
@@ -54,7 +61,7 @@ export default function Dashboard() {
       {/* Sidebar — its own boundary so a sidebar crash never kills main content */}
       <ErrorBoundary label="Sidebar">
         <div style={{ position: 'relative', zIndex: 10 }}>
-          <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+          <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
         </div>
       </ErrorBoundary>
 
