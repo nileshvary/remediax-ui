@@ -469,7 +469,7 @@ export default function AgentPipeline() {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 600 }}>CVE Watcher</p>
+                <p style={{ color: '#F1F5F9', fontSize: 16, fontWeight: 700 }}>CVE Watcher</p>
                 <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11, marginTop: 2 }}>
                   Auto-Update Engine · Runs nightly
                 </p>
