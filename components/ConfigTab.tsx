@@ -238,8 +238,12 @@ export default function ConfigTab() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-5 max-w-3xl"
+      className="w-full"
     >
+      <div className="grid gap-5" style={{ gridTemplateColumns: 'minmax(0,1.6fr) minmax(0,1fr)' }}>
+      {/* ── Left column ── */}
+      <div className="space-y-5">
+
       {/* Section 1 — Scan Target */}
       <div className="glass-card p-5">
         <SectionHeader icon={Target} title="Scan Target" color="#00D4FF" />
@@ -458,6 +462,93 @@ export default function ConfigTab() {
           </div>
         )}
       </div>
+
+      </div>{/* end left column */}
+
+      {/* ── Right column — Config Status ── */}
+      <div className="space-y-4">
+
+        {/* Current Config Summary */}
+        <div className="glass-card p-5 space-y-4">
+          <div className="flex items-center gap-2 mb-1">
+            <CheckCircle size={14} style={{ color: '#00D4FF' }} />
+            <h3 style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Config Status</h3>
+          </div>
+
+          {/* Target */}
+          <div className="space-y-1">
+            <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Scan Target</p>
+            <p className="truncate" style={{ color: cfg.target_url ? '#00D4FF' : 'rgba(148,163,184,0.3)', fontSize: 12 }}>
+              {cfg.target_url || 'Not set'}
+            </p>
+          </div>
+
+          {/* API Keys status */}
+          <div className="space-y-1">
+            <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>API Keys</p>
+            <div className="space-y-1.5">
+              {[
+                { label: 'Anthropic', set: cfg.anthropic_api_key_set },
+                { label: 'OpenAI', set: cfg.openai_api_key_set },
+                ...cfg.custom_key_names.map(k => ({ label: k, set: cfg.custom_keys_set[k] ?? false })),
+              ].map(k => (
+                <div key={k.label} className="flex items-center justify-between">
+                  <span style={{ color: 'rgba(148,163,184,0.6)', fontSize: 12 }}>{k.label}</span>
+                  <span style={{ fontSize: 11, fontWeight: 500, color: k.set ? '#00FF87' : 'rgba(148,163,184,0.3)' }}>
+                    {k.set ? '● Set' : '○ Not set'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Scanners */}
+          <div className="space-y-1">
+            <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Scanners</p>
+            <div className="flex flex-wrap gap-1.5">
+              {cfg.scanners.length === 0
+                ? <span style={{ color: 'rgba(148,163,184,0.3)', fontSize: 12 }}>None selected</span>
+                : cfg.scanners.map(s => (
+                  <span key={s} className="px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00D4FF', fontSize: 11 }}>{s}</span>
+                ))
+              }
+            </div>
+          </div>
+
+          {/* Settings row */}
+          <div className="grid grid-cols-2 gap-3 pt-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <div>
+              <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11 }}>PyRIT Turns</p>
+              <p style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600 }}>{cfg.pyrit_max_turns}</p>
+            </div>
+            <div>
+              <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11 }}>Log Level</p>
+              <p style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600 }}>{cfg.log_level}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Reference */}
+        <div className="glass-card p-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={14} style={{ color: '#F59E0B' }} />
+            <h3 style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Quick Reference</h3>
+          </div>
+          {[
+            { label: 'Garak', desc: 'OWASP LLM01, LLM05 — offline red-teaming' },
+            { label: 'PyRIT', desc: 'LLM01–LLM10 — multi-turn crescendo attacks' },
+            { label: 'Vector Poisoner', desc: 'ASI01–ASI10 — RAG & agentic poisoning' },
+          ].map(item => (
+            <div key={item.label} className="flex flex-col gap-0.5 p-2.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p style={{ color: '#E2E8F0', fontSize: 12, fontWeight: 500 }}>{item.label}</p>
+              <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
+
+      </div>{/* end right column */}
+
+      </div>{/* end grid */}
     </motion.div>
   );
 }
