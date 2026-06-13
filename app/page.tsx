@@ -19,6 +19,7 @@ const TopAttackedAssets   = dynamic(() => import('../components/TopAttackedAsset
 const TrafficOverview     = dynamic(() => import('../components/TrafficOverview'),     { ssr: false, loading: () => null });
 const SecurityPostureTrend= dynamic(() => import('../components/SecurityPostureTrend'),{ ssr: false, loading: () => null });
 const ConfigTab           = dynamic(() => import('../components/ConfigTab'),           { ssr: false, loading: () => null });
+const ScanTab             = dynamic(() => import('../components/ScanTab'),             { ssr: false, loading: () => null });
 
 function PlaceholderTab({ label }: { label: string }) {
   return (
@@ -119,7 +120,7 @@ export default function Dashboard() {
 
             {activeTab === 'Pipeline'    && <ErrorBoundary label="Pipeline"><AgentPipeline /></ErrorBoundary>}
             {activeTab === 'Config'      && <ErrorBoundary label="Config"><ConfigTab /></ErrorBoundary>}
-            {activeTab === 'Scan'        && <PlaceholderTab label="Scan" />}
+            {activeTab === 'Scan'        && <ErrorBoundary label="Scan"><ScanTab /></ErrorBoundary>}
             {activeTab === 'Guardrails'  && <PlaceholderTab label="Guardrails" />}
             {activeTab === 'Reports'     && <PlaceholderTab label="Reports" />}
             {activeTab === 'Benchmark'   && <PlaceholderTab label="Benchmark" />}
