@@ -13,6 +13,7 @@ import TopAttackedAssets from '../components/TopAttackedAssets';
 import TrafficOverview from '../components/TrafficOverview';
 import SecurityPostureTrend from '../components/SecurityPostureTrend';
 import ConfigTab from '../components/ConfigTab';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { Calendar, RefreshCw } from 'lucide-react';
 
 const ParticleBackground = dynamic(() => import('../components/ParticleBackground'), { ssr: false });
@@ -48,15 +49,20 @@ export default function Dashboard() {
     <div className="flex h-screen overflow-hidden" style={{ background: '#0A0F1E', position: 'relative' }}>
       <ParticleBackground />
 
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
+      {/* Sidebar — isolated boundary so a sidebar crash never kills main content */}
+      <ErrorBoundary label="Sidebar">
+        <div style={{ position: 'relative', zIndex: 10 }}>
+          <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        </div>
+      </ErrorBoundary>
 
       <div className="flex-1 flex flex-col overflow-hidden" style={{ position: 'relative', zIndex: 10 }}>
-        <TopBar />
+        <ErrorBoundary label="TopBar">
+          <TopBar />
+        </ErrorBoundary>
 
         <main className="flex-1 overflow-y-auto p-5 space-y-5" style={{ background: 'transparent' }}>
-          {/* Page title bar */}
+          {/* Page title bar — no boundary needed, pure static JSX */}
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl font-bold" style={{ color: '#E2E8F0' }}>{title.heading}</h1>
@@ -76,28 +82,28 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Dashboard */}
+          {/* Dashboard — each panel isolated so one crash never blanks the whole screen */}
           {activeTab === 'Dashboard' && (
             <>
-              <KPICards />
+              <ErrorBoundary label="KPI Cards"><KPICards /></ErrorBoundary>
               <div className="grid gap-5" style={{ gridTemplateColumns: '1fr 320px' }}>
-                <AgentPipeline />
-                <AlertsFeed />
+                <ErrorBoundary label="Agent Pipeline"><AgentPipeline /></ErrorBoundary>
+                <ErrorBoundary label="Alerts Feed"><AlertsFeed /></ErrorBoundary>
               </div>
               <div className="grid grid-cols-3 gap-5">
-                <ThreatLandscape />
-                <AIInsights />
-                <TopAttackedAssets />
+                <ErrorBoundary label="Threat Landscape"><ThreatLandscape /></ErrorBoundary>
+                <ErrorBoundary label="AI Insights"><AIInsights /></ErrorBoundary>
+                <ErrorBoundary label="Top Attack Vectors"><TopAttackedAssets /></ErrorBoundary>
               </div>
               <div className="grid grid-cols-2 gap-5">
-                <TrafficOverview />
-                <SecurityPostureTrend />
+                <ErrorBoundary label="Probe Activity"><TrafficOverview /></ErrorBoundary>
+                <ErrorBoundary label="Security Posture Trend"><SecurityPostureTrend /></ErrorBoundary>
               </div>
             </>
           )}
 
-          {activeTab === 'Pipeline'      && <AgentPipeline />}
-          {activeTab === 'Config'        && <ConfigTab />}
+          {activeTab === 'Pipeline'      && <ErrorBoundary label="Pipeline"><AgentPipeline /></ErrorBoundary>}
+          {activeTab === 'Config'        && <ErrorBoundary label="Config"><ConfigTab /></ErrorBoundary>}
           {activeTab === 'Scan'          && <PlaceholderTab label="Scan" />}
           {activeTab === 'Guardrails'    && <PlaceholderTab label="Guardrails" />}
           {activeTab === 'Reports'       && <PlaceholderTab label="Reports" />}
