@@ -212,7 +212,7 @@ export default function ConfigTab() {
       setCustomRows(r => r.map((x, i) => i === idx ? { ...x, value: '', show: false } : x));
       setCfg(c => ({
         ...c,
-        custom_key_names: [...new Set([...c.custom_key_names, row.name.trim().toUpperCase()])],
+        custom_key_names: Array.from(new Set([...c.custom_key_names, row.name.trim().toUpperCase()])),
         custom_keys_set: { ...c.custom_keys_set, [row.name.trim().toUpperCase()]: true },
       }));
     } catch { /* silent */ }
