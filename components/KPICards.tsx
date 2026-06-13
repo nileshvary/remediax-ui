@@ -48,7 +48,7 @@ function Counter({ target, suffix }: { target: number; suffix?: string }) {
   }, [target]);
 
   return (
-    <span className="text-lg font-bold leading-none tabular-nums" style={{ color: '#E2E8F0' }}>
+    <span className="leading-none tabular-nums" style={{ color: '#E2E8F0', fontSize: 28, fontWeight: 700 }}>
       {target === 0 ? '—' : display}{suffix}
     </span>
   );
@@ -110,13 +110,13 @@ export default function KPICards() {
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-xs font-medium mb-1" style={{ color: 'rgba(148,163,184,0.7)' }}>
+                <p className="mb-1" style={{ color: 'rgba(148,163,184,0.7)', fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                   {kpi.label}
                 </p>
                 <div className="flex items-end gap-1">
                   <Counter target={kpi.numericValue} />
                   {kpi.unit && kpi.numericValue > 0 && (
-                    <span className="text-sm font-medium mb-0.5" style={{ color: kpi.color }}>{kpi.unit}</span>
+                    <span className="mb-0.5" style={{ color: kpi.color, fontSize: 11, fontWeight: 400 }}>{kpi.unit}</span>
                   )}
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function KPICards() {
               {kpi.up
                 ? <TrendingUp size={12} style={{ color: '#00FF87' }} />
                 : <TrendingDown size={12} style={{ color: '#FF2D55' }} />}
-              <span className="text-xs font-semibold truncate" style={{ color: kpi.up ? '#00FF87' : '#FF2D55' }}>
+              <span className="truncate" style={{ color: kpi.up ? '#00FF87' : '#FF2D55', fontSize: 11, fontWeight: 400 }}>
                 {kpi.change}
               </span>
             </div>

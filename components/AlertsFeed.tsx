@@ -52,7 +52,7 @@ export default function AlertsFeed() {
       {/* Header */}
       <div className="flex items-center gap-2">
         <AlertTriangle size={14} style={{ color: '#FF2D55' }} />
-        <h3 className="font-bold" style={{ color: '#E2E8F0', fontSize: 14 }}>Scan Findings</h3>
+        <h3 style={{ color: '#E2E8F0', fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Scan Findings</h3>
         {criticalCount > 0 && (
           <span className="font-bold px-2 py-0.5 rounded-full"
             style={{ background: '#FF2D55', color: '#fff', fontSize: 11,
@@ -66,12 +66,12 @@ export default function AlertsFeed() {
       {/* Feed */}
       <div className="flex-1 overflow-y-auto space-y-1.5" style={{ maxHeight: 280 }}>
         {loading && (
-          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+          <p className="text-center py-4" style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11 }}>
             Loading findings…
           </p>
         )}
         {!loading && alerts.length === 0 && (
-          <p className="text-xs text-center py-4" style={{ color: 'rgba(148,163,184,0.5)' }}>
+          <p className="text-center py-4" style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11 }}>
             No findings. Run a scan to populate.
           </p>
         )}
@@ -100,19 +100,19 @@ export default function AlertsFeed() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold truncate" style={{ color: '#E2E8F0', fontSize: 13 }}>
+                    <p className="truncate" style={{ color: '#E2E8F0', fontSize: 13, fontWeight: 500 }}>
                       {alert.title}
                     </p>
                     <ChevronRight size={12} style={{ color: 'rgba(148,163,184,0.3)', flexShrink: 0 }}
                       className="group-hover:translate-x-0.5 transition-transform" />
                   </div>
                   <div className="flex items-center gap-2 mt-1.5">
-                    <span className="font-semibold px-1.5 py-0.5 rounded"
-                      style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: 10 }}>
+                    <span className="px-1.5 py-0.5 rounded"
+                      style={{ background: `${cfg.color}18`, color: cfg.color, fontSize: 11, fontWeight: 500 }}>
                       {cfg.label}
                     </span>
-                    <span style={{ color: 'rgba(148,163,184,0.6)', fontSize: 10 }}>{alert.category}</span>
-                    <span className="ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: 10 }}>
+                    <span style={{ color: 'rgba(148,163,184,0.6)', fontSize: 11 }}>{alert.category}</span>
+                    <span className="ml-auto capitalize" style={{ color: 'rgba(148,163,184,0.4)', fontSize: 11 }}>
                       {alert.source}
                     </span>
                   </div>
@@ -124,9 +124,9 @@ export default function AlertsFeed() {
       </div>
 
       {/* Footer */}
-      <button className="w-full py-2 font-medium rounded-lg transition-colors"
+      <button className="w-full py-2 rounded-lg transition-colors"
         style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.15)',
-                 color: '#00D4FF', fontSize: 12 }}>
+                 color: '#00D4FF', fontSize: 11, fontWeight: 500 }}>
         View All {alerts.length} Findings
       </button>
     </div>

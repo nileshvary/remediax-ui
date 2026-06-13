@@ -117,11 +117,12 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
               <li key={item.label}>
                 <motion.button
                   onClick={() => onTabChange(item.label)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium group relative"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg group relative"
                   style={{
                     background: isActive ? 'rgba(0, 212, 255, 0.12)' : 'transparent',
                     color: isActive ? '#00D4FF' : 'rgba(148, 163, 184, 0.8)',
                     borderLeft: isActive ? '2px solid #00D4FF' : '2px solid transparent',
+                    fontSize: 13, fontWeight: 500,
                   }}
                   whileHover={{ background: isActive ? 'rgba(0,212,255,0.12)' : 'rgba(0,212,255,0.05)', x: isActive ? 0 : 2, transition: { duration: 0.15 } }}
                   whileTap={{ scale: 0.97 }}

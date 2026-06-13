@@ -57,8 +57,8 @@ export default function TopBar() {
         <input
           type="text"
           placeholder="Search findings, probes, guardrails..."
-          className="flex-1 bg-transparent text-sm outline-none"
-          style={{ color: 'rgba(226, 232, 240, 0.9)', caretColor: '#00D4FF' }}
+          className="flex-1 bg-transparent outline-none"
+          style={{ color: 'rgba(226, 232, 240, 0.9)', caretColor: '#00D4FF', fontSize: 13 }}
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
         />
@@ -79,8 +79,8 @@ export default function TopBar() {
       <div className="flex items-center gap-3 ml-auto">
         {/* Run Scan */}
         <button
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200"
-          style={{ background: 'rgba(0, 212, 255, 0.08)', border: '1px solid rgba(0, 212, 255, 0.2)', color: '#00D4FF' }}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200"
+          style={{ background: 'rgba(0, 212, 255, 0.08)', border: '1px solid rgba(0, 212, 255, 0.2)', color: '#00D4FF', fontSize: 13, fontWeight: 500 }}
           onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.15)'; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0, 212, 255, 0.08)'; }}
         >
@@ -94,7 +94,7 @@ export default function TopBar() {
           style={{ background: s.bg, border: `1px solid ${s.border}` }}
         >
           <Shield size={13} style={{ color: s.color }} />
-          <span className="text-xs font-medium" style={{ color: s.color }}>{s.label}</span>
+          <span style={{ color: s.color, fontSize: 11, fontWeight: 500 }}>{s.label}</span>
         </div>
 
         {/* Notification bell */}
@@ -113,8 +113,8 @@ export default function TopBar() {
             A
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs font-semibold" style={{ color: '#E2E8F0' }}>Admin</div>
-            <div className="text-xs" style={{ color: 'rgba(148, 163, 184, 0.6)' }}>Super Admin</div>
+            <div style={{ color: '#E2E8F0', fontSize: 11, fontWeight: 500 }}>Admin</div>
+            <div style={{ color: 'rgba(148, 163, 184, 0.6)', fontSize: 11 }}>Super Admin</div>
           </div>
           <ChevronDown size={12} style={{ color: 'rgba(148, 163, 184, 0.5)' }} />
         </button>

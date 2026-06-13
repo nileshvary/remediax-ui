@@ -115,12 +115,12 @@ function NodeCard({ n, glowId }: { n: NodeDef; glowId: string }) {
       </foreignObject>
       {/* Label — middle zone */}
       <text x={n.cx} y={n.y + 34} textAnchor="middle" fill="#E2E8F0"
-        fontSize="13" fontWeight="700" fontFamily="Inter, ui-sans-serif, sans-serif">
+        fontSize="16" fontWeight="700" fontFamily="Inter, ui-sans-serif, sans-serif">
         {n.label}
       </text>
       {/* Sub — bottom zone */}
       <text x={n.cx} y={n.y + 51} textAnchor="middle" fill={n.color}
-        fontSize="10" fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.70">
+        fontSize="11" fontWeight="500" fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.70">
         {n.sub}
       </text>
       {/* Marching ants */}
@@ -219,7 +219,7 @@ export default function AgentPipeline() {
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 inline-block"
               style={{ background: '#22C55E', animation: 'blink 2s ease-in-out infinite' }} />
-            <span style={{ color: '#F1F5F9', fontSize: 16, fontWeight: 700 }}>RemediAX Agent Pipeline</span>
+            <span style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>RemediAX Agent Pipeline</span>
           </div>
           <p className="mt-0.5 ml-3.5" style={{ color: 'rgba(148,163,184,0.4)', fontSize: 11 }}>
             Real-time AI security orchestration topology
@@ -439,12 +439,12 @@ export default function AgentPipeline() {
               </div>
             </foreignObject>
             <text x={ORC.cx} y={ORC.cy + 22} textAnchor="middle"
-              fill="#F1F5F9" fontSize="13" fontWeight="700"
+              fill="#F1F5F9" fontSize="16" fontWeight="700"
               fontFamily="Inter, ui-sans-serif, sans-serif" letterSpacing="0.04em">
               Orchestrator
             </text>
             <text x={ORC.cx} y={ORC.cy + 36} textAnchor="middle"
-              fill="#1A8FFF" fontSize="9.5"
+              fill="#1A8FFF" fontSize="11" fontWeight="500"
               fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.90">
               Claude API Brain
             </text>
@@ -469,7 +469,7 @@ export default function AgentPipeline() {
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p style={{ color: '#F1F5F9', fontSize: 13, fontWeight: 700 }}>CVE Watcher</p>
+                <p style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 600 }}>CVE Watcher</p>
                 <p style={{ color: 'rgba(148,163,184,0.5)', fontSize: 11, marginTop: 2 }}>
                   Auto-Update Engine · Runs nightly
                 </p>
@@ -499,9 +499,9 @@ export default function AgentPipeline() {
             style={{ borderRight: i < stats.length - 1 ? '1px solid rgba(0,102,255,0.08)' : 'none' }}>
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="w-1.5 h-1.5 rounded-full inline-block" style={{ background: s.color }} />
-              <span style={{ color: '#F1F5F9', fontSize: 14, fontWeight: 700 }}>{s.value}</span>
+              <span style={{ color: '#F1F5F9', fontSize: 16, fontWeight: 700 }}>{s.value}</span>
             </div>
-            <span style={{ color: 'rgba(148,163,184,0.4)', fontSize: 10 }}>{s.label}</span>
+            <span style={{ color: 'rgba(148,163,184,0.4)', fontSize: 11 }}>{s.label}</span>
           </div>
         ))}
       </div>

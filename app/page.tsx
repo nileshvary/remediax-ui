@@ -69,12 +69,12 @@ export default function Dashboard() {
             {/* Title bar — pure static JSX, no boundary needed */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-xl font-bold" style={{ color: '#E2E8F0' }}>{title.heading}</h1>
-                <p className="text-sm mt-0.5" style={{ color: 'rgba(148,163,184,0.5)' }}>{title.sub}</p>
+                <h1 className="text-xl font-semibold" style={{ color: '#E2E8F0' }}>{title.heading}</h1>
+                <p className="mt-0.5" style={{ color: 'rgba(148,163,184,0.5)', fontSize: 13 }}>{title.sub}</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(148,163,184,0.7)' }}>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(148,163,184,0.7)', fontSize: 11 }}>
                   <Calendar size={12} />
                   <span>Last 24 hours</span>
                 </div>
