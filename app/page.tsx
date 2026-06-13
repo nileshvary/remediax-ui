@@ -78,7 +78,8 @@ export default function Dashboard() {
                   <Calendar size={12} />
                   <span>Last 24 hours</span>
                 </div>
-                <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors"
+                <button onClick={() => window.location.reload()}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors"
                   style={{ background: 'rgba(0,212,255,0.08)', border: '1px solid rgba(0,212,255,0.2)', color: '#00D4FF' }}>
                   <RefreshCw size={12} />
                   <span>Refresh</span>
