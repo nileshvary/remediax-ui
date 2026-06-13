@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { Calendar, RefreshCw } from 'lucide-react';
