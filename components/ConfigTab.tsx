@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Eye, EyeOff, Save, CheckCircle, AlertCircle, Target, Key, SlidersHorizontal } from 'lucide-react';
+import { Eye, EyeOff, Save, CheckCircle, AlertCircle, Target, Key, SlidersHorizontal, Plus, Trash2 } from 'lucide-react';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
@@ -16,6 +16,8 @@ interface Config {
   anthropic_api_key_set: boolean;
   openai_api_key_set: boolean;
   mistral_api_key_set: boolean;
+  custom_key_names: string[];
+  custom_keys_set: Record<string, boolean>;
 }
 
 const DEFAULT_CONFIG: Config = {
@@ -28,6 +30,8 @@ const DEFAULT_CONFIG: Config = {
   anthropic_api_key_set: false,
   openai_api_key_set: false,
   mistral_api_key_set: false,
+  custom_key_names: [],
+  custom_keys_set: {},
 };
 
 function SectionHeader({ icon: Icon, title, color = '#00D4FF' }: { icon: React.ElementType; title: string; color?: string }) {
@@ -120,16 +124,24 @@ function MaskedKeyField({ label, fieldName, isSet, onSave }: {
   );
 }
 
+interface CustomKeyRow { name: string; value: string; show: boolean; }
+
 export default function ConfigTab() {
   const [cfg, setCfg] = useState<Config>(DEFAULT_CONFIG);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [customRows, setCustomRows] = useState<CustomKeyRow[]>([]);
 
   useEffect(() => {
     fetch(`${API}/api/config`)
       .then(r => r.json())
-      .then((data: Config) => setCfg({ ...DEFAULT_CONFIG, ...data }))
+      .then((data: Config) => {
+        setCfg({ ...DEFAULT_CONFIG, ...data });
+        if (data.custom_key_names?.length) {
+          setCustomRows(data.custom_key_names.map(name => ({ name, value: '', show: false })));
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -166,6 +178,24 @@ export default function ConfigTab() {
         body: JSON.stringify({ [field]: value }),
       });
       setCfg(c => ({ ...c, [`${field}_set`]: true }));
+    } catch { /* silent */ }
+  }
+
+  async function saveCustomKey(idx: number) {
+    const row = customRows[idx];
+    if (!row.name.trim() || !row.value.trim()) return;
+    try {
+      await fetch(`${API}/api/config`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ custom_keys: { [row.name.trim()]: row.value.trim() } }),
+      });
+      setCustomRows(r => r.map((x, i) => i === idx ? { ...x, value: '', show: false } : x));
+      setCfg(c => ({
+        ...c,
+        custom_key_names: [...new Set([...c.custom_key_names, row.name.trim().toUpperCase()])],
+        custom_keys_set: { ...c.custom_keys_set, [row.name.trim().toUpperCase()]: true },
+      }));
     } catch { /* silent */ }
   }
 
@@ -246,6 +276,68 @@ export default function ConfigTab() {
             isSet={cfg.mistral_api_key_set}
             onSave={saveKey}
           />
+
+          {/* Custom keys */}
+          {customRows.map((row, idx) => (
+            <div key={idx} className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <input
+                  value={row.name}
+                  onChange={e => setCustomRows(r => r.map((x, i) => i === idx ? { ...x, name: e.target.value } : x))}
+                  placeholder="KEY_NAME (e.g. GEMINI_API_KEY)"
+                  className="flex-1 px-3 py-1.5 rounded-lg text-xs outline-none"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#E2E8F0', marginRight: 8 }}
+                />
+                {cfg.custom_keys_set[row.name.toUpperCase()] && (
+                  <span className="text-xs px-2 py-0.5 rounded-full font-medium mr-2"
+                    style={{ background: 'rgba(0,255,135,0.1)', color: '#00FF87', border: '1px solid rgba(0,255,135,0.2)', whiteSpace: 'nowrap' }}>
+                    Set ✓
+                  </span>
+                )}
+                <button onClick={() => setCustomRows(r => r.filter((_, i) => i !== idx))}
+                  style={{ color: 'rgba(255,45,85,0.6)' }}>
+                  <Trash2 size={13} />
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 flex items-center px-3 py-2 rounded-lg gap-2"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <input
+                    type={row.show ? 'text' : 'password'}
+                    value={row.value}
+                    onChange={e => setCustomRows(r => r.map((x, i) => i === idx ? { ...x, value: e.target.value } : x))}
+                    placeholder={cfg.custom_keys_set[row.name.toUpperCase()] ? '••••••••••••••••' : 'Enter key…'}
+                    className="flex-1 bg-transparent text-sm outline-none"
+                    style={{ color: '#E2E8F0', caretColor: '#00D4FF' }}
+                  />
+                  <button onClick={() => setCustomRows(r => r.map((x, i) => i === idx ? { ...x, show: !x.show } : x))}
+                    style={{ color: 'rgba(148,163,184,0.5)' }}>
+                    {row.show ? <EyeOff size={13} /> : <Eye size={13} />}
+                  </button>
+                </div>
+                <button
+                  onClick={() => saveCustomKey(idx)}
+                  disabled={!row.name.trim() || !row.value.trim()}
+                  className="px-3 py-2 rounded-lg text-xs font-medium transition-colors"
+                  style={{
+                    background: (row.name.trim() && row.value.trim()) ? 'rgba(0,212,255,0.12)' : 'rgba(255,255,255,0.04)',
+                    border: (row.name.trim() && row.value.trim()) ? '1px solid rgba(0,212,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                    color: (row.name.trim() && row.value.trim()) ? '#00D4FF' : 'rgba(148,163,184,0.4)',
+                  }}>
+                  Save
+                </button>
+              </div>
+              <p className="text-xs" style={{ color: 'rgba(148,163,184,0.4)' }}>Stored in server .env only — never sent to browser after save</p>
+            </div>
+          ))}
+
+          <button
+            onClick={() => setCustomRows(r => [...r, { name: '', value: '', show: false }])}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors w-fit"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)', color: 'rgba(148,163,184,0.6)' }}>
+            <Plus size={12} />
+            Add Custom Key
+          </button>
         </div>
       </div>
 
