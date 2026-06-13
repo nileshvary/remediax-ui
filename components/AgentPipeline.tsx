@@ -237,7 +237,7 @@ export default function AgentPipeline() {
       </div>
 
       {/* ── Topology canvas ── */}
-      <div className="relative w-full" style={{ paddingBottom: svgPad, background: '#04050f' }}>
+      <div className="relative w-full" style={{ paddingBottom: svgPad, background: '#04050f', maxHeight: '280px' }}>
 
         <canvas ref={cvRef} className="absolute inset-0 w-full h-full"
           style={{ display:'block', pointerEvents:'none', opacity: 0.60 }} />
@@ -446,7 +446,7 @@ export default function AgentPipeline() {
             <text x={ORC.cx} y={ORC.cy + 36} textAnchor="middle"
               fill="#1A8FFF" fontSize="11" fontWeight="500"
               fontFamily="Inter, ui-sans-serif, sans-serif" opacity="0.90">
-              Claude API Brain
+              Brain
             </text>
           </motion.g>
         </svg>
