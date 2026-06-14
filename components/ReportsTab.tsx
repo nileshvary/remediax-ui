@@ -42,25 +42,11 @@ export default function ReportsTab() {
 
   const openInNewTab = () => window.open(`${API}/api/report`, '_blank');
 
-  const downloadPDF = async () => {
-    try {
-      const resp = await fetch(`${API}/api/report`);
-      const html = await resp.text();
-      const blob = new Blob([html], { type: 'text/html' });
-      const blobUrl = URL.createObjectURL(blob);
-      const win = window.open(blobUrl, '_blank');
-      if (win) {
-        win.onload = () => {
-          setTimeout(() => {
-            win.print();
-            URL.revokeObjectURL(blobUrl);
-          }, 400);
-        };
-      }
-    } catch {
-      // Fallback: open raw and let user Ctrl+P manually
-      window.open(`${API}/api/report`, '_blank');
-    }
+  const downloadPDF = () => {
+    // Open full report in new tab — user presses Ctrl+P → Save as PDF.
+    // Blob URL + auto-print was revoked before the browser finished printing,
+    // causing silent truncation. Direct URL is simpler and reliable.
+    window.open(`${API}/api/report`, '_blank');
   };
 
   return (
@@ -207,7 +193,7 @@ export default function ReportsTab() {
       {/* PDF tip */}
       {reportExists !== false && (
         <p style={{ color: 'rgba(148,163,184,0.4)', fontSize: 11, textAlign: 'center' }}>
-          To save as PDF: click <strong style={{ color: 'rgba(148,163,184,0.6)' }}>Download PDF</strong> — report opens in a new tab → press <kbd style={{ color: 'rgba(148,163,184,0.6)' }}>Ctrl+P</kbd> → Save as PDF
+          To save as PDF: click <strong style={{ color: 'rgba(148,163,184,0.6)' }}>Download PDF</strong> → report opens in a new tab with all findings → press <kbd style={{ color: 'rgba(148,163,184,0.6)' }}>Ctrl+P</kbd> → Destination: <em style={{ color: 'rgba(148,163,184,0.6)' }}>Save as PDF</em>
         </p>
       )}
     </div>
