@@ -27,6 +27,7 @@ export default function ReportsTab() {
   const [iframeLoaded, setIframeLoaded] = useState(false);
   const [reportExists, setReportExists] = useState<boolean | null>(null);
   const [iframeKey] = useState(0);
+  const [iframeHeight, setIframeHeight] = useState('calc(100vh - 260px)');
 
   useEffect(() => {
     fetch(`${API}/api/score`)
@@ -38,6 +39,18 @@ export default function ReportsTab() {
       .then(r => r.json())
       .then((d: { exists: boolean }) => setReportExists(d.exists))
       .catch(() => setReportExists(false));
+  }, []);
+
+  // Auto-resize iframe to fit full report content via postMessage from the report template.
+  // Cross-origin (API port ≠ app port) so we can't read contentDocument — postMessage is the only safe channel.
+  useEffect(() => {
+    const handler = (ev: MessageEvent) => {
+      if (ev.data?.remediax === 'height' && typeof ev.data.value === 'number') {
+        setIframeHeight(`${ev.data.value + 32}px`);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
   }, []);
 
   const openInNewTab = () => window.open(`${API}/api/report`, '_blank');
@@ -135,18 +148,17 @@ export default function ReportsTab() {
         </div>
       </div>
 
-      {/* Report viewer */}
+      {/* Report viewer — no overflow-hidden; iframe grows to full content height via postMessage */}
       <div
-        className="rounded-xl overflow-hidden relative"
+        className="rounded-xl relative"
         style={{
           background: 'rgba(255,255,255,0.02)',
           border: '1px solid rgba(255,255,255,0.08)',
-          minHeight: 'calc(100vh - 260px)',
         }}
       >
         {reportExists === false ? (
           /* Report file missing */
-          <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: 'calc(100vh - 260px)' }}>
+          <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: '400px' }}>
             <div
               className="flex items-center justify-center rounded-full"
               style={{ width: 56, height: 56, background: 'rgba(255,140,0,0.1)', border: '1px solid rgba(255,140,0,0.3)' }}
@@ -180,7 +192,7 @@ export default function ReportsTab() {
               onLoad={() => setIframeLoaded(true)}
               style={{
                 width: '100%',
-                height: 'calc(100vh - 260px)',
+                height: iframeHeight,
                 border: 'none',
                 display: 'block',
                 borderRadius: 12,
